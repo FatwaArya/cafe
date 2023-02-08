@@ -6,19 +6,13 @@ generator client {
 }
 
 datasource db {
-    provider = "mysql"
+    provider     = "mysql"
     // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+    url          = env("DATABASE_URL")
     relationMode = "prisma"
-}
-
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 }
 
 // Necessary for Next auth
@@ -28,16 +22,17 @@ model Account {
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String?  @db.Text
-    access_token      String?  @db.Text
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
     expires_at        Int?
     token_type        String?
     scope             String?
-    id_token          String?  @db.Text
+    id_token          String? @db.Text
     session_state     String?
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
+    @@index([userId])
 }
 
 model Session {
@@ -46,18 +41,24 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }
 
-model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    role         Role      @default(KASIR)
-    accounts      Account[]
-    sessions      Session[]
-    transaksi     Transaksi[]
+enum STATUS {
+    PAID
+    NOT_PAID
+}
+
+enum ROLE {
+    CASHIER
+    MANAGER
+    ADMIN
+}
+
+enum MENU_TYPE {
+    FOOD
+    BEVERAGE
 }
 
 model VerificationToken {
@@ -67,60 +68,54 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
-model Meja {
-    id            String    @id @default(cuid())
-    nomor_meja    String
-    status        String
-    transaksi     Transaksi[]
-}
-model Menu{
-    id            String    @id @default(cuid())
-    nama_menu     String
-    jenis_menu    JenisMenu @default(MAKANAN)
-    harga         String
-    deskripsi     String
-    gambar        String
-    detail_transaksi detail_transaksi[]
-}
-enum JenisMenu{
-    MAKANAN
-    MINUMAN
+
+model User {
+    id            String        @id @default(cuid())
+    name          String?
+    email         String?       @unique
+    emailVerified DateTime?
+    image         String?
+    role          ROLE          @default(CASHIER)
+    accounts      Account[]
+    sessions      Session[]
+    Transaction   Transaction[]
 }
 
-model detail_transaksi {
-    id            String    @id @default(cuid())
-    id_transaksi  String
-    transaksi     Transaksi @relation(fields: [id_transaksi], references: [id], onDelete: Cascade)
-    id_menu       String
-    total_harga   String
-    menu         Menu      @relation(fields: [id_menu], references: [id], onDelete: Cascade)
-    
-
-    @@index([id_transaksi])
-    @@index([id_menu])
-}
-model Transaksi{
-    id            String    @id @default(cuid())
-    id_meja       String
-    tgl_transaksi DateTime
-    id_user       String
-    nama_pelanggan String
-    detail_transaksi detail_transaksi[]
-    status        Status @default(BELUM_BAYAR)
-    user         User   @relation(fields: [id_user], references: [id], onDelete: Cascade)
-    meja        Meja   @relation(fields: [id_meja], references: [id], onDelete: Cascade)
-
-    @@index([id_user])
-    @@index([id_meja])
+model Table {
+    id          String        @id @default(cuid())
+    number      String
+    Transaction Transaction[]
 }
 
-enum Status{
-    BELUM_BAYAR
-    LUNAS
+model Menu {
+    id          String        @id @default(cuid())
+    name        String
+    price       String
+    type        MENU_TYPE     @default(FOOD)
+    desc        String?
+    image       String?
+    Transaction Transaction[]
 }
 
-enum Role {
-    KASIR
-    MANAGER
-    ADMIN
+model Transaction {
+    id              String   @id @default(cuid())
+    transactionDate DateTime
+    status          STATUS   @default(NOT_PAID)
+    table           Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+    tableId         String
+    menu            Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+    menuId          String
+    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId          String
+    cutomerName     String
+
+    @@index([tableId])
+    @@index([menuId])
+    @@index([userId])
+}
+
+//make whitelist model for user
+model WhitelistEmail {
+    id    String @id @default(cuid())
+    email String @unique
 }

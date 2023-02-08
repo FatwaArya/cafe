@@ -7,11 +7,26 @@ import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db";
 
 export const authOptions: NextAuthOptions = {
-  // Include user.id on session
   callbacks: {
+    async signIn({ user }) {
+      //allow only whitelisted emails to sign in
+      const email = await prisma.whitelistEmail.findUnique({
+        where: {
+          email: user.email as string,
+        },
+      });
+
+      if (email) {
+        return true;
+      }
+
+      return false;
+    },
+
     session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
+        session.user.role = user.role;
       }
       return session;
     },
