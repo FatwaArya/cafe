@@ -70,19 +70,15 @@ model VerificationToken {
 }
 
 model User {
-    id               String         @id @default(cuid())
-    name             String?
-    email            String?        @unique
-    emailVerified    DateTime?
-    image            String?
-    role             ROLE           @default(CASHIER)
-    whitelistEmail   WhitelistEmail @relation(fields: [whitelistEmailId], references: [id], onDelete: Cascade)
-    whitelistEmailId String         @unique
-    accounts         Account[]
-    sessions         Session[]
-    Transaction      Transaction[]
-
-    @@index([whitelistEmailId])
+    id            String        @id @default(cuid())
+    name          String?
+    email         String?       @unique
+    emailVerified DateTime?
+    image         String?
+    role          ROLE          @default(CASHIER)
+    accounts      Account[]
+    sessions      Session[]
+    Transaction   Transaction[]
 }
 
 model Table {
@@ -122,5 +118,4 @@ model Transaction {
 model WhitelistEmail {
     id    String @id @default(cuid())
     email String @unique
-    User  User[]
 }
