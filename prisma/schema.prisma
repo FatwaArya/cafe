@@ -98,16 +98,17 @@ model Menu {
 }
 
 model Transaction {
-    id              String   @id @default(cuid())
-    transactionDate DateTime
-    status          STATUS   @default(NOT_PAID)
-    table           Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
-    tableId         String
-    menu            Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
-    menuId          String
-    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId          String
-    cutomerName     String
+    id           String   @id @default(cuid())
+    status       STATUS   @default(NOT_PAID)
+    table        Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+    tableId      String
+    menu         Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+    menuId       String
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId       String
+    customerName String
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
 
     @@index([tableId])
     @@index([menuId])
