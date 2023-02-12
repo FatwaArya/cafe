@@ -2,9 +2,10 @@ import NextAuth, { type NextAuthOptions } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-
+import jwt from "jsonwebtoken";
 import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db";
+import { redirect } from "next/dist/server/api-utils/index.js";
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
@@ -31,6 +32,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -48,6 +50,10 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  pages: {
+    signIn: "/",
+    newUser: "/auth/new-user", // New users will be directed here on first sign in (leave the property out if not of interest)
+  },
 };
 
 export default NextAuth(authOptions);
