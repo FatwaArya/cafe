@@ -94,14 +94,13 @@ model Table {
 }
 
 model Menu {
-    id                String              @id @default(cuid())
-    name              String
-    price             String
-    type              MENU_TYPE           @default(FOOD)
-    desc              String?
-    image             String?
-    Transaction       Transaction[]
-    TransactionDetail TransactionDetail[]
+    id          String        @id @default(cuid())
+    name        String
+    price       String
+    type        MENU_TYPE     @default(FOOD)
+    desc        String?
+    image       String?
+    Transaction Transaction[]
 }
 
 model Transaction {
@@ -127,16 +126,12 @@ model Transaction {
 }
 
 model TransactionDetail {
-    id String @id @default(cuid())
-
-    menu        Menu          @relation(fields: [menuId], references: [id], onDelete: Cascade)
-    menuId      String
-    quantity    Int
+    id          String        @id @default(cuid())
     createdAt   DateTime      @default(now())
     updatedAt   DateTime      @updatedAt
     transaction Transaction[]
 
-    @@index([menuId])
+    @@index([id])
 }
 
 //make whitelist model for user

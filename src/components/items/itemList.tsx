@@ -10,18 +10,6 @@ import { XMarkIcon, CheckIcon, ChevronUpDownIcon } from '@heroicons/react/24/out
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
-const people = [
-    { id: 1, name: 'Wade Cooper' },
-    { id: 2, name: 'Arlene Mccoy' },
-    { id: 3, name: 'Devon Webb' },
-    { id: 4, name: 'Tom Cook' },
-    { id: 5, name: 'Tanya Fox' },
-    { id: 6, name: 'Hellen Schmidt' },
-    { id: 7, name: 'Caroline Schultz' },
-    { id: 8, name: 'Mason Heaney' },
-    { id: 9, name: 'Claudie Smitham' },
-    { id: 10, name: 'Emil Schaefer' },
-]
 
 interface Items {
     id: string
@@ -36,6 +24,7 @@ interface Items {
 export default function ItemList() {
     const { data: items } = api.cashier.getsMenu.useQuery()
     const { data: tables } = api.cashier.getsTable.useQuery()
+
     //track the selected item
     const [selectedItem, setSelectedItem] = useState<Items[]>([])
     const [open, setOpen] = useState(false)
@@ -105,22 +94,27 @@ export default function ItemList() {
 
     return (
         <>
-            <button
-                onClick={() => setOpen(true)}
-                type="button"
-            // className="items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 float-right "
-            >
-                open cart
-            </button>
-            <div className="bg-white">
 
-                <div className="max-w-7xl mx-auto overflow-hidden sm:px-6 lg:px-8">
+            <div className="bg-white flex flex-col">
+                <div className='flex-end mb-3'>
+                    <button
+                        onClick={() => setOpen(true)}
+                        disabled={selectedItem.length === 0}
+                        type="button"
+                        //change the color of the button if there is no item in cart
+                        className={classNames(selectedItem.length === 0 ? 'bg-gray-300' : 'bg-indigo-600', 'px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  float-right')}
+                    >
+                        open cart
+                    </button>
+                </div>
+
+                <div className="max-w-7xl mx-auto overflow-hidden ">
                     <h2 className="sr-only">Products</h2>
 
-                    <div className="-mx-px border-l border-t border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3 lg:grid-cols-4">
+                    <div className="-mx-px border-l border-t border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3 lg:grid-cols-5 ">
                         {items?.map((product) => (
                             <div key={product.id} className="group relative p-4 border-r border-b border-gray-200 sm:p-6 ">
-                                <div className="rounded-lg overflow-hidden bg-gray-200 aspect-w-1 aspect-h-1 group-hover:opacity-75">
+                                <div className="rounded-lg overflow-hidden bg-gray-200 aspect-w-1 aspect-h-1 ">
                                     <Image
                                         src={product.image || ""}
                                         alt={product.desc || ""}
@@ -140,7 +134,7 @@ export default function ItemList() {
                                                 currency: 'IDR',
                                             }).format(parseInt(product.price))
                                         }</p>
-                                        <p className="mt-4 text-base  text-gray-900  font-normal  ">{product.type}</p>
+                                        <p className="mt-4 text-base  text-gray-900  font-normal ">{product.type}</p>
                                     </div>
 
 

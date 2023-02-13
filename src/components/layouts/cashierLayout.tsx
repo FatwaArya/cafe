@@ -118,7 +118,7 @@ export default function CashierLayout({ children }: { children: React.ReactNode 
                                             width={32}
                                             height={32}
                                         />
-                                        <p className="text-2xl font-semibold mx-2">wikucafe</p>
+                                        <p className="text-2xl font-semibold mx-2">wikucashier</p>
                                     </div>
                                     <nav className="mt-5 px-2 space-y-1">
                                         {navigation.map((item) => (
@@ -192,7 +192,7 @@ export default function CashierLayout({ children }: { children: React.ReactNode 
                                     width={32}
                                     height={32}
                                 />
-                                <p className="text-2xl font-semibold mx-2">wikucafe</p>
+                                <p className="text-2xl font-semibold mx-2">wikucashier</p>
                             </div>
                             <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
                                 {navigation.map((item) => (
