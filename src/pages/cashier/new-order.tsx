@@ -5,18 +5,18 @@ import { roleGuard } from "../../utils/guard";
 import { ReactElement } from "react";
 import CashierLayout from "../../components/layouts/cashierLayout";
 import { NextPageWithLayout } from "../_app";
+import ItemList from "../../components/items/itemList";
+import Head from "next/head";
 
 
 const NewOrder: NextPageWithLayout = () => {
     return (
         <>
-            hello cashier
-            assa
-            <button
-                onClick={() => signOut(
-                    { callbackUrl: "/" }
-                )}
-            >sign out</button>
+            <Head>
+                <title>New Order</title>
+
+            </Head>
+            <ItemList />
         </>
     )
 }

@@ -6,6 +6,13 @@ const prisma = new PrismaClient();
 
 async function main() {
   //create table and product and then create transaction using faker
+
+  await prisma.whitelistEmail.create({
+    data: {
+      email: "fatwastaruz@gmail.com",
+    },
+  });
+
   for (let i = 0; i < 10; i++) {
     await prisma.table.create({
       data: {
@@ -16,8 +23,9 @@ async function main() {
     await prisma.menu.create({
       data: {
         name: faker.commerce.productName(),
-        price: faker.commerce.price(),
+        price: faker.finance.amount(10000, 100000, 2),
         desc: faker.commerce.productDescription(),
+        image: faker.image.food(1234, 2345, true),
       },
     });
   }
