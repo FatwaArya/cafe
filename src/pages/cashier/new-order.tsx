@@ -7,7 +7,7 @@ import CashierLayout from "../../components/layouts/cashierLayout";
 import { NextPageWithLayout } from "../_app";
 
 
-const Cashier: NextPageWithLayout = () => {
+const NewOrder: NextPageWithLayout = () => {
     return (
         <>
             hello cashier
@@ -22,12 +22,12 @@ const Cashier: NextPageWithLayout = () => {
 }
 
 
-Cashier.getLayout = function getLayout(page: ReactElement) {
+NewOrder.getLayout = function getLayout(page: ReactElement) {
     return <CashierLayout>{page}</CashierLayout>
 };
 
 
-export default Cashier
+export default NewOrder
 
 //prevent other roles from accessing this page
 
