@@ -10,26 +10,38 @@ import type { AppProps } from "next/app";
 import { api } from "../utils/api";
 
 import "../styles/globals.css";
+import AuthGuard from "../components/auth/AuthGuard";
 
 
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+export type WikuPage<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
+  authRequired?: boolean;
+  role?: string;
 };
 
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
+type WikuAppProps = AppProps & {
+  Component: WikuPage;
 };
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
-}: AppPropsWithLayout) => {
+}: WikuAppProps) => {
   const getLayout = Component.getLayout ?? ((page) => page);
-
+  const authRequired = Component.authRequired ?? false;
+  const role = Component.role ?? "";
   return (
     //return getLayout with session provider
     <SessionProvider session={session}>
-      {getLayout(<Component {...pageProps} />)}
+      {
+        authRequired && role ? (
+          <AuthGuard role={role}>
+            {getLayout(<Component {...pageProps} />)}
+          </AuthGuard>
+        ) : (
+          getLayout(<Component {...pageProps} />)
+        )
+      }
     </SessionProvider>
   );
 };

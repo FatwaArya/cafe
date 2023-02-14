@@ -1,13 +1,12 @@
 import { signOut } from "next-auth/react";
 import { GetServerSidePropsContext } from "next";
 import { getServerAuthSession } from "../../server/auth";
-import { roleGuard } from "../../utils/guard";
 import { ReactElement } from "react";
 import CashierLayout from "../../components/layouts/cashierLayout";
-import { NextPageWithLayout } from "../_app";
+import { WikuPage } from "../_app";
 
 
-const Cashier: NextPageWithLayout = () => {
+const Cashier: WikuPage = () => {
     return (
         <>
             hello cashier
@@ -25,19 +24,21 @@ const Cashier: NextPageWithLayout = () => {
 Cashier.getLayout = function getLayout(page: ReactElement) {
     return <CashierLayout>{page}</CashierLayout>
 };
+Cashier.authRequired = true;
+Cashier.role = "cashier";
 
 
 export default Cashier
 
 //prevent other roles from accessing this page
 
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-    return roleGuard(ctx, (session: any) => ({
-        props: {
-            session,
-        },
-    }), "cashier")
-}
+// export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+//     return roleGuard(ctx, (session: any) => ({
+//         props: {
+//             session,
+//         },
+//     }), "cashier")
+// }
 
 
 
