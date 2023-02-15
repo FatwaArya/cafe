@@ -1,6 +1,6 @@
 
 import { StarIcon } from '@heroicons/react/24/solid'
-import { api } from '../../utils/api'
+import { api } from '../../../utils/api'
 import Image from 'next/image'
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, Listbox } from '@headlessui/react'
@@ -24,12 +24,13 @@ interface Items {
 export default function ItemList() {
     const { data: items } = api.cashier.getsMenu.useQuery()
     const { data: tables } = api.cashier.getsTable.useQuery()
-
+    const utils = api.useContext()
     //track the selected item
     const [selectedItem, setSelectedItem] = useState<Items[]>([])
     const [open, setOpen] = useState(false)
     const [customerName, setCustomerName] = useState('')
     const [selected, setSelected] = useState(tables?.[0])
+
 
 
     //if product is already in cart, increase quantity
@@ -71,6 +72,7 @@ export default function ItemList() {
 
     const createOrder = api.cashier.createOrder.useMutation({
         onSuccess: () => {
+            utils.cashier.getTransaction.invalidate();
             setSelectedItem([])
             setOpen(false)
         }
@@ -87,7 +89,7 @@ export default function ItemList() {
             items: order,
             customerName: customerName,
             tableId: selected?.id as string,
-
+            total: total
         })
     }
 
@@ -102,7 +104,7 @@ export default function ItemList() {
                         disabled={selectedItem.length === 0}
                         type="button"
                         //change the color of the button if there is no item in cart
-                        className={classNames(selectedItem.length === 0 ? 'bg-gray-300' : 'bg-indigo-600', 'px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  float-right')}
+                        className={classNames(selectedItem.length === 0 ? 'bg-gray-300' : 'bg-indigo-600', 'px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  float-right')}
                     >
                         open cart
                     </button>
@@ -185,7 +187,7 @@ export default function ItemList() {
                                         <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
                                             <div className="flex-1 overflow-y-auto py-6 px-4 sm:px-6">
                                                 <div className="flex items-start justify-between">
-                                                    <Dialog.Title className="text-lg font-medium text-gray-900">Shopping cart</Dialog.Title>
+                                                    <Dialog.Title className="text-lg font-medium text-gray-900">Order</Dialog.Title>
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <button
                                                             type="button"

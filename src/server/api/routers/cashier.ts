@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
 
-import { createTRPCRouter, publicProcedure, cashierProcedure } from "../trpc";
+import { createTRPCRouter, cashierProcedure } from "../trpc";
 
 export const cashierRouter = createTRPCRouter({
   getsMenu: cashierProcedure.query(async ({ ctx }) => {
@@ -18,11 +19,40 @@ export const cashierRouter = createTRPCRouter({
 
     return tables;
   }),
+  getTransaction: cashierProcedure.query(async ({ ctx }) => {
+    const transactions = await ctx.prisma.transactionDetail.findMany({
+      where: {
+        transaction: {
+          some: {
+            userId: ctx.session.user.id,
+          },
+        },
+      },
+      include: {
+        transaction: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    //return only id, transactionNumber, createdAt, and quantity
+    return transactions.map((transaction) => {
+      return {
+        id: transaction.id,
+        transactionNumber: transaction.transactionNumber,
+        createdAt: transaction.createdAt,
+        quantity: transaction.transaction.length,
+        total: transaction.total,
+      };
+    });
+  }),
   createOrder: cashierProcedure
     .input(
       z.object({
         customerName: z.string(),
         tableId: z.string(),
+        total: z.number(),
         items: z.array(
           z.object({
             menuId: z.string(),
@@ -32,9 +62,14 @@ export const cashierRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { customerName, tableId, items } = input;
-      //loop through items and create transaction
-      const { id } = await ctx.prisma.transactionDetail.create({ data: {} });
+      const { customerName, tableId, items, total } = input;
+      const transactionNumber = `${"order-" + uuidv4().slice(0, 8)}`;
+      const { id } = await ctx.prisma.transactionDetail.create({
+        data: {
+          transactionNumber,
+          total,
+        },
+      });
 
       items.forEach(async (item) => {
         await ctx.prisma.$transaction([
