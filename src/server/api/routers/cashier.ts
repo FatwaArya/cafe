@@ -63,11 +63,13 @@ export const cashierRouter = createTRPCRouter({
               id: true,
               quantity: true,
               customerName: true,
+              status: true,
               menu: {
                 select: {
                   name: true,
                   price: true,
                   image: true,
+                  desc: true,
                 },
               },
             },
