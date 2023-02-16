@@ -20,7 +20,11 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function CashierLayout({ children }: { children: React.ReactNode }) {
+interface ICashierLayoutProps {
+    children: React.ReactNode
+}
+
+const CashierLayout: React.FC<ICashierLayoutProps> = ({ children }) => {
     const { data: session, status } = useSession()
 
     if (status === 'loading') {
@@ -279,3 +283,5 @@ export default function CashierLayout({ children }: { children: React.ReactNode 
         </>
     )
 }
+
+export default CashierLayout

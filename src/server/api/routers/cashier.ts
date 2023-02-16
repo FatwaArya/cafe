@@ -47,6 +47,28 @@ export const cashierRouter = createTRPCRouter({
       };
     });
   }),
+  getDetailTransactionById: cashierProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { id } = input;
+      const transaction = await ctx.prisma.transactionDetail.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          transaction: {
+            include: {
+              menu: true,
+            },
+          },
+        },
+      });
+      return transaction;
+    }),
   createOrder: cashierProcedure
     .input(
       z.object({

@@ -68,8 +68,9 @@ export default function ItemList() {
     const calculateTotalPrice = () => {
         return selectedItem.reduce((ack: number, item) => ack + item.quantity * parseInt(item.price), 0)
     }
+    //total price
     const total = calculateTotalPrice()
-
+    //create order mutation
     const createOrder = api.cashier.createOrder.useMutation({
         onSuccess: () => {
             utils.cashier.getTransaction.invalidate();
@@ -77,7 +78,6 @@ export default function ItemList() {
             setOpen(false)
         }
     })
-
     const handleCreateOrder = () => {
         //extract the id 
         const order = selectedItem.map((item) => ({
@@ -96,20 +96,26 @@ export default function ItemList() {
 
     return (
         <>
-
             <div className="bg-white flex flex-col">
-                <div className='flex-end mb-3'>
-                    <button
-                        onClick={() => setOpen(true)}
-                        disabled={selectedItem.length === 0}
-                        type="button"
-                        //change the color of the button if there is no item in cart
-                        className={classNames(selectedItem.length === 0 ? 'bg-gray-300' : 'bg-indigo-600', 'px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  float-right')}
-                    >
-                        open cart
-                    </button>
-                </div>
+                <div className="sm:flex sm:items-center mb-6">
+                    <div className="sm:flex-auto">
+                        <h1 className="text-xl font-semibold text-gray-900">New Order</h1>
+                        <p className="mt-2 text-sm text-gray-700">
+                            A list of all the items available in the menu. Select the items customer want to order.
+                        </p>
+                    </div>
+                    <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+                        <button
+                            onClick={() => setOpen(true)}
+                            disabled={selectedItem.length === 0}
+                            type="button"
+                            className={classNames(selectedItem.length === 0 ? 'bg-gray-300' : 'bg-indigo-600', 'px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  float-right')}
+                        >
+                            open cart
+                        </button>
+                    </div>
 
+                </div>
                 <div className="max-w-7xl mx-auto overflow-hidden ">
                     <h2 className="sr-only">Products</h2>
 
