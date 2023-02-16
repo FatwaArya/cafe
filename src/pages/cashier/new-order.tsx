@@ -1,8 +1,5 @@
-import { signOut } from "next-auth/react";
-import { GetServerSidePropsContext } from "next";
-import { getServerAuthSession } from "../../server/auth";
 import { ReactElement } from "react";
-import CashierLayout from "../../components/layouts/cashierLayout";
+import CashierLayout from "../../components/cashier/layout/cashierLayout";
 import { WikuPage } from "../_app";
 import ItemList from "../../components/cashier/items/itemList";
 import Head from "next/head";
@@ -12,11 +9,9 @@ const NewOrder: WikuPage = () => {
     return (
         <>
             <Head>
-                <title>New Order</title>
-
+                <title>Cashier | New Order</title>
             </Head>
             <ItemList />
-
         </>
     )
 }
