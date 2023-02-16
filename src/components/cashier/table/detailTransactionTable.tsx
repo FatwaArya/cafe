@@ -13,16 +13,16 @@ const DetailTransactionTable = ({ id }: { id: string }) => {
     return (
         <>
 
-            <div className="bg-white">
+            <div className="bg-white print:text-black">
 
                 <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:pb-24 lg:px-8">
 
                     <div className="max-w-xl flex flex-col">
-                        <div className="mb-4">
+                        <div className="mb-4 ">
 
                             <Link
                                 href="/cashier"
-                                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 print:hidden"
                             >
                                 <ArrowLeftIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
                                 Back
@@ -82,6 +82,9 @@ const DetailTransactionTable = ({ id }: { id: string }) => {
                                             <th scope="col" className="hidden w-1/5 pr-8 py-3 font-normal sm:table-cell">
                                                 Price
                                             </th>
+                                            <th scope="col" className="hidden w-1/5 pr-8 py-3 font-normal sm:table-cell">
+                                                Quantity
+                                            </th>
                                             <th scope="col" className="hidden pr-8 py-3 font-normal sm:table-cell">
                                                 Status
                                             </th>
@@ -100,7 +103,7 @@ const DetailTransactionTable = ({ id }: { id: string }) => {
                                                             alt={product.menu.desc || ""}
                                                             width={64}
                                                             height={64}
-                                                            className="w-16 h-16 object-center object-cover rounded mr-6"
+                                                            className="w-16 h-16 object-center object-cover rounded mr-6 print:hidden"
                                                         />
                                                         <div>
                                                             <div className="font-medium text-gray-900">{product.menu.name}</div>
@@ -109,6 +112,7 @@ const DetailTransactionTable = ({ id }: { id: string }) => {
                                                     </div>
                                                 </td>
                                                 <td className="hidden py-6 pr-8 sm:table-cell">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(parseInt(product.menu.price))}</td>
+                                                <td className="hidden py-6 pr-8 sm:table-cell">{product.quantity}</td>
                                                 <td className="hidden py-6 pr-8 sm:table-cell">{product.status}</td>
                                                 <td className="py-6 font-medium text-right whitespace-nowrap">
                                                     <a className="text-indigo-600">

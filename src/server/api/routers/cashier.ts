@@ -28,24 +28,22 @@ export const cashierRouter = createTRPCRouter({
           },
         },
       },
+
       include: {
-        transaction: true,
+        transaction: {
+          select: {
+            id: true,
+            quantity: true,
+          },
+        },
       },
+
       orderBy: {
         createdAt: "desc",
       },
     });
 
-    //return only id, transactionNumber, createdAt, and quantity
-    return transactions.map((transaction) => {
-      return {
-        id: transaction.id,
-        transactionNumber: transaction.transactionNumber,
-        createdAt: transaction.createdAt,
-        quantity: transaction.transaction.length,
-        total: transaction.total,
-      };
-    });
+    return transactions;
   }),
   getDetailTransactionById: cashierProcedure
     .input(
@@ -61,8 +59,17 @@ export const cashierRouter = createTRPCRouter({
         },
         include: {
           transaction: {
-            include: {
-              menu: true,
+            select: {
+              id: true,
+              quantity: true,
+              customerName: true,
+              menu: {
+                select: {
+                  name: true,
+                  price: true,
+                  image: true,
+                },
+              },
             },
           },
         },

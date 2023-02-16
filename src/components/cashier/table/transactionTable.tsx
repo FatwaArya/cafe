@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 export default function TransactionTable() {
     const { data: transactions } = api.cashier.getTransaction.useQuery()
-
+    console.log(transactions)
     return (
         <>
 
@@ -32,12 +32,12 @@ export default function TransactionTable() {
                                             </th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                                 <a href="#" className="group inline-flex">
-                                                    Order number
+                                                    Order Number
                                                 </a>
                                             </th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                                 <a href="#" className="group inline-flex">
-                                                    Order quantity
+                                                    Order Quantity
                                                 </a>
                                             </th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
@@ -47,7 +47,8 @@ export default function TransactionTable() {
                                             </th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                                 <a href="#" className="group inline-flex">
-                                                    Date                                                </a>
+                                                    Date Placed
+                                                </a>
                                             </th>
                                             <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                                 <span className="sr-only">Edit</span>
@@ -61,9 +62,13 @@ export default function TransactionTable() {
                                                     {key + 1}
                                                 </td>
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{transaction.transactionNumber}</td>
-                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{transaction.quantity}</td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{
+                                                    transaction.transaction.map((item) => (
+                                                        item.quantity
+                                                    )).reduce((a, b) => a + b, 0)
+                                                }</td>
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transaction.total)}</td>
-                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{transaction.createdAt.toLocaleString('sv')}</td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{transaction.createdAt.toLocaleDateString()}</td>
 
                                                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                                     <Link href={`/cashier/detail/${transaction.id}`} className="text-indigo-600 hover:text-indigo-900">
