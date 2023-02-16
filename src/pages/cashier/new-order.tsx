@@ -4,7 +4,7 @@ import { getServerAuthSession } from "../../server/auth";
 import { ReactElement } from "react";
 import CashierLayout from "../../components/layouts/cashierLayout";
 import { WikuPage } from "../_app";
-import ItemList from "../../components/items/itemList";
+import ItemList from "../../components/cashier/items/itemList";
 import Head from "next/head";
 
 

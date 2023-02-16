@@ -126,10 +126,12 @@ model Transaction {
 }
 
 model TransactionDetail {
-    id          String        @id @default(cuid())
-    createdAt   DateTime      @default(now())
-    updatedAt   DateTime      @updatedAt
-    transaction Transaction[]
+    id                String        @id @default(cuid())
+    transactionNumber String
+    total             Int
+    createdAt         DateTime      @default(now())
+    updatedAt         DateTime      @updatedAt
+    transaction       Transaction[]
 
     @@index([id])
 }
