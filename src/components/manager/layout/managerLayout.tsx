@@ -121,7 +121,7 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
                                             width={32}
                                             height={32}
                                         />
-                                        <p className="text-2xl font-semibold mx-2">wikucashier</p>
+                                        <p className="text-2xl font-semibold mx-2">wikumanager</p>
                                     </div>
                                     <nav className="mt-5 px-2 space-y-1">
                                         {navigation.map((item) => (
@@ -195,7 +195,7 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
                                     width={32}
                                     height={32}
                                 />
-                                <p className="text-2xl font-semibold mx-2">wikucashier</p>
+                                <p className="text-2xl font-semibold mx-2">wikumanager</p>
                             </div>
                             <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
                                 {navigation.map((item) => (

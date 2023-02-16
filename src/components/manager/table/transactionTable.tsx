@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../../utils/api'
 import Link from 'next/link'
+import { AdjustmentsHorizontalIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import DatePicker from 'react-datepicker'
+import { format, getDate } from 'date-fns'
 
 
 export default function AllTransactionTable() {
     const { data: transactions } = api.manager.getTransaction.useQuery()
     //search by 
     const [searchField, setSearchField] = useState('')
+    const [startDate, setStartDate] = useState<Date>(new Date()
+    );
     const [filteredTransactions, setFilteredTransactions] = useState(transactions)
 
     useEffect(() => {
@@ -16,6 +21,31 @@ export default function AllTransactionTable() {
         setFilteredTransactions(newFilteredTransactions)
     }, [searchField, transactions])
 
+    useEffect(() => {
+        const newFilteredDateTransactions = transactions?.filter((transaction) => {
+            return transaction.transaction[0]?.createdAt?.toLocaleDateString().includes(startDate.toLocaleDateString())
+        })
+        setFilteredTransactions(newFilteredDateTransactions)
+    }, [startDate, transactions])
+
+    //if theres transaction on that date then show the red dot on top of the date
+    const renderDayContents = (day: any, date: any) => {
+        const isTransaction = transactions?.find((transaction) => {
+            return transaction.transaction[0]?.createdAt?.toLocaleDateString().includes(date.toLocaleDateString())
+        })
+        return (
+            <div className='inline-block relative'>
+
+                <div className=''>
+                    {date.getDate()}
+                </div>
+                {isTransaction && <span className="absolute top-[-4px] right-[-9px] block h-2 w-2 rounded-full ring-2 ring-white bg-red-400" />
+                }
+
+
+            </div>
+        );
+    };
     return (
         <>
 
@@ -28,17 +58,76 @@ export default function AllTransactionTable() {
                         </p>
                     </div>
                 </div>
-                <div className="mt-3">
-                    <input
+                <div className='flex justify-between'>
+                    <div className="mt-3 relative rounded-md shadow-sm">
+                        <input
 
-                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                        type="text"
-                        onChange={(e) => {
-                            setSearchField(e.target.value)
-                        }}
-                        placeholder='Search by name'
-                    />
+                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            type="text"
+                            onChange={(e) => {
+                                setSearchField(e.target.value)
+                            }}
+                            placeholder='Search by name'
+                        />
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer  ">
+                            <AdjustmentsHorizontalIcon className="h-5 w-5 text-gray-400 " aria-hidden="true" onClick={() => { }} />
+                        </div>
+                    </div>
+                    <div className="mt-3 relative rounded-md shadow-sm">
+                        <DatePicker
+                            selected={startDate}
+                            onChange={(date) => setStartDate(date as Date)}
+                            startDate={startDate}
+                            selectsStart
+                            renderDayContents={renderDayContents}
+                            renderCustomHeader={({
+                                date,
+                                decreaseMonth,
+                                increaseMonth,
+                                prevMonthButtonDisabled,
+                                nextMonthButtonDisabled,
+                            }) => (
+                                <div className="flex items-center justify-between px-2 py-2 ">
+                                    <span className="text-lg text-gray-700 ">
+                                        {format(date, 'MM/dd/yyyy')}
+                                    </span>
+
+                                    <div className="space-x-2">
+                                        <button
+                                            onClick={decreaseMonth}
+                                            disabled={prevMonthButtonDisabled}
+                                            type="button"
+                                            className={`
+                              ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
+                              inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500
+                          `}
+                                        >
+                                            <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
+                                        </button>
+
+                                        <button
+                                            onClick={increaseMonth}
+                                            disabled={nextMonthButtonDisabled}
+                                            type="button"
+                                            className={`
+                              ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
+                              inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500
+                          `}
+                                        >
+                                            <ChevronRightIcon className="w-5 h-5 text-gray-600" />
+                                        </button>
+                                    </div>
+
+
+                                </div>
+
+
+                            )}
+                        />
+
+                    </div>
                 </div>
+
                 <div className="mt-8 flex flex-col">
                     <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
                         <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">

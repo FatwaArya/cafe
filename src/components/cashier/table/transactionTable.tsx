@@ -5,7 +5,6 @@ import Link from 'next/link'
 
 export default function TransactionTable() {
     const { data: transactions } = api.cashier.getTransaction.useQuery()
-    console.log(transactions)
     return (
         <>
 
