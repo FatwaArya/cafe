@@ -4,6 +4,8 @@ import DetailTransactionTable from "../../../components/cashier/table/detailTran
 import CashierLayout from "../../../components/cashier/layout/cashierLayout";
 import { ReactElement } from "react";
 import Head from "next/head";
+import { GetServerSidePropsContext } from "next";
+import { roleGuard } from "../../../utils/roleGuard";
 
 
 const DetailOrder: WikuPage = () => {
@@ -20,6 +22,14 @@ const DetailOrder: WikuPage = () => {
 }
 
 DetailOrder.authRequired = true;
-DetailOrder.role = "cashier";
+
+// export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+//     return roleGuard(ctx, (session: any) => ({
+//         props: {
+//             session,
+//         },
+//     }), "cashier")
+// }
+
 
 export default DetailOrder
