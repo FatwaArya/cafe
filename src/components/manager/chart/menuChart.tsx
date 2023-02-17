@@ -17,12 +17,13 @@ export default function MenuChart() {
     const startDate = useOrderDateStore(state => state.order.date)
 
     const newStartDate = startDate?.toISOString() as string
+    console.log(newStartDate)
     const { data: stats } = api.manager.getStatistic.useQuery(
         { date: newStartDate },
     )
     const allTime = useOrderDateStore(state => state.order.allOrders)
     const [filteredStats, setFilteredStats] = useState(stats)
-
+    console.log(filteredStats)
 
     // useEffect(() => {
     //     const sortedByDate = stats?.filter((stat) => {
@@ -54,21 +55,6 @@ export default function MenuChart() {
     // }, [startDate, stats, allTime]);
 
     useEffect(() => {
-        const sorted = stats?.filter((stat) => {
-            const date = stat.createdAt
-            return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
-        })
-
-        const newFilteredByDate = sorted?.reduce((acc: any[], cur) => {
-            const existingItem = acc.find((item) => item.name === cur.name)
-            if (existingItem) {
-                existingItem.quantity += cur.quantity
-            } else {
-                acc.push(cur)
-            }
-            return acc
-        }, [])
-
         const newFilteredAllTime = stats?.reduce((acc: any[], cur) => {
             const index = acc.findIndex((item) => item.name === cur.name)
             if (index === -1) {
@@ -82,12 +68,11 @@ export default function MenuChart() {
         if (allTime) {
             setFilteredStats(newFilteredAllTime)
         } else {
-            setFilteredStats(sorted)
+            setFilteredStats(stats)
         }
     }, [startDate, stats, allTime])
 
 
-    console.log(filteredStats)
     const data = {
         labels: filteredStats?.map((menu) => menu.name),
         datasets: [

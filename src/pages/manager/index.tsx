@@ -5,13 +5,16 @@ import ManagerLayout from "../../components/manager/layout/managerLayout";
 import { ReactElement } from "react";
 import { roleGuard } from "../../utils/roleGuard";
 import AllTransactionTable from "../../components/manager/table/transactionTable";
-import { api } from "../../utils/api";
 import MenuChart from "../../components/manager/chart/menuChart";
+import Head from "next/head";
 
 const Manager: WikuPage = () => {
 
     return (
         <>
+            <Head>
+                <title>Manager | Overview</title>
+            </Head>
             <AllTransactionTable />
             <MenuChart />
         </>

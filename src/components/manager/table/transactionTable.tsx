@@ -14,6 +14,7 @@ export default function AllTransactionTable() {
     const { data: transactions } = api.manager.getTransaction.useQuery(
         { date: newStartDate },
     )
+    const { data: transactionsDate } = api.manager.getTransaction.useQuery({})
     const setStartDate = useOrderDateStore(state => state.setDate)
     const setAllOrders = useOrderDateStore(state => state.setAllOrders)
     const [filteredTransactions, setFilteredTransactions] = useState(transactions)
@@ -41,17 +42,15 @@ export default function AllTransactionTable() {
     }, [startDate, transactions, allTime])
 
     const renderDayContents = (day: any, date: any) => {
-        //if theres transaction then show the red dot on top of the date but still show if were on different date
-        const isTransaction = transactions?.some((transaction) => {
-            const transactionDate = transaction.transaction[0]?.createdAt
-            return transactionDate?.getDate() === date.getDate() && transactionDate?.getMonth() === date.getMonth() && transactionDate?.getFullYear() === date.getFullYear()
+        const isTransaction = transactionsDate?.some((transaction) => {
+            return transaction.transaction[0]?.createdAt?.getDate() === date.getDate() && transaction.transaction[0]?.createdAt?.getMonth() === date.getMonth() && transaction.transaction[0]?.createdAt?.getFullYear() === date.getFullYear()
         })
 
         return (
             <button className='inline-block relative' key={day} onClick={() => {
                 setAllTime(false)
             }}>
-                <div className='cursor-pointer' >
+                <div className='' >
                     {date.getDate()}
                 </div>
                 {isTransaction && <span className="absolute top-[-4px] right-[-9px] block h-2 w-2 rounded-full ring-2 ring-white bg-red-400" />}

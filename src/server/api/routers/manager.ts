@@ -43,9 +43,6 @@ export const managerRouter = createTRPCRouter({
           createdAt: "desc",
         },
       });
-      if (transactions.length === undefined) {
-        return [];
-      }
 
       return transactions;
     }),
@@ -53,18 +50,16 @@ export const managerRouter = createTRPCRouter({
   getStatistic: managerProcedure
     .input(
       z.object({
-        date: z.string().optional(),
+        date: z.string().nullish(),
       })
     )
     .query(async ({ ctx, input }) => {
       const { date } = input;
-
       const popularMenus = await ctx.prisma.transaction.groupBy({
         by: ["menuId"],
         _sum: {
           quantity: true,
         },
-        //if date is undefined, it will return all data
         where: {
           createdAt: {
             gte: date ? date?.slice(0, 10) + "T00:00:00.000Z" : undefined,

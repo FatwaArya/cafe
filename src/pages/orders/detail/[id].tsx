@@ -14,7 +14,7 @@ const DetailOrder: WikuPage = () => {
     return (
         <>
             <Head>
-                <title>Cashier | Detail Order</title>
+                <title>Detail Order</title>
             </Head>
             <DetailTransactionTable id={id as string} />
         </>

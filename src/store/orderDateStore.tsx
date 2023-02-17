@@ -13,8 +13,7 @@ interface orderDateState {
 
 export const useOrderDateStore = create<orderDateState>()((set) => ({
     order: {
-        //new date is the current date with time set to T00:00:00Z
-        date: new Date(new Date().setHours(0, 0, 0, 0)),
+        date: new Date(),
         setAllOrders: false
     },
     setAllOrders() {
