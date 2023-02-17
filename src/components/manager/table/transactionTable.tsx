@@ -4,15 +4,20 @@ import Link from 'next/link'
 import { AdjustmentsHorizontalIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import DatePicker from 'react-datepicker'
 import { format, getDate } from 'date-fns'
+import { useOrderDateStore } from '../../../store/orderDateStore'
 
 
 export default function AllTransactionTable() {
-    const { data: transactions } = api.manager.getTransaction.useQuery()
-    //search by 
     const [searchField, setSearchField] = useState('')
-    const [startDate, setStartDate] = useState<Date>(new Date()
-    );
+    const startDate = useOrderDateStore(state => state.order.date)
+    const newStartDate = startDate?.toISOString() as string
+    const { data: transactions } = api.manager.getTransaction.useQuery(
+        { date: newStartDate },
+    )
+    const setStartDate = useOrderDateStore(state => state.setDate)
+    const setAllOrders = useOrderDateStore(state => state.setAllOrders)
     const [filteredTransactions, setFilteredTransactions] = useState(transactions)
+    const [allTime, setAllTime] = useState(false)
 
     useEffect(() => {
         const newFilteredTransactions = transactions?.filter((transaction) => {
@@ -22,30 +27,39 @@ export default function AllTransactionTable() {
     }, [searchField, transactions])
 
     useEffect(() => {
-        const newFilteredDateTransactions = transactions?.filter((transaction) => {
-            return transaction.transaction[0]?.createdAt?.toLocaleDateString().includes(startDate.toLocaleDateString())
-        })
-        setFilteredTransactions(newFilteredDateTransactions)
-    }, [startDate, transactions])
+        if (allTime) {
+            setFilteredTransactions(transactions)
+            setAllOrders()
+        } else {
+            const newFilteredTransactions = transactions?.filter((transaction) => {
+                const date = transaction.transaction[0]?.createdAt
+                return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
+            }
+            )
+            setFilteredTransactions(newFilteredTransactions)
+        }
+    }, [startDate, transactions, allTime])
 
-    //if theres transaction on that date then show the red dot on top of the date
     const renderDayContents = (day: any, date: any) => {
-        const isTransaction = transactions?.find((transaction) => {
-            return transaction.transaction[0]?.createdAt?.toLocaleDateString().includes(date.toLocaleDateString())
+        //if theres transaction then show the red dot on top of the date but still show if were on different date
+        const isTransaction = transactions?.some((transaction) => {
+            const transactionDate = transaction.transaction[0]?.createdAt
+            return transactionDate?.getDate() === date.getDate() && transactionDate?.getMonth() === date.getMonth() && transactionDate?.getFullYear() === date.getFullYear()
         })
-        return (
-            <div className='inline-block relative'>
 
-                <div className='cursor-pointer'>
+        return (
+            <button className='inline-block relative' key={day} onClick={() => {
+                setAllTime(false)
+            }}>
+                <div className='cursor-pointer' >
                     {date.getDate()}
                 </div>
-                {isTransaction && <span className="absolute top-[-4px] right-[-9px] block h-2 w-2 rounded-full ring-2 ring-white bg-red-400" />
-                }
-
-
-            </div>
+                {isTransaction && <span className="absolute top-[-4px] right-[-9px] block h-2 w-2 rounded-full ring-2 ring-white bg-red-400" />}
+            </button>
         );
     };
+
+
     return (
         <>
 
@@ -80,6 +94,7 @@ export default function AllTransactionTable() {
                             startDate={startDate}
                             selectsStart
                             renderDayContents={renderDayContents}
+                            placeholderText='All Time'
                             renderCustomHeader={({
                                 date,
                                 decreaseMonth,
@@ -91,16 +106,28 @@ export default function AllTransactionTable() {
                                     <span className="text-lg text-gray-700 ">
                                         {format(date, 'MM/dd/yyyy')}
                                     </span>
+                                    <div className="space-x-2">
+                                        <button
+                                            onClick={() => {
+                                                setAllTime(!allTime)
+                                            }}
+                                            disabled={allTime}
+                                            type="button"
+                                            //if all time is true then disable the button
+                                            className={`${allTime && 'cursor-not-allowed opacity-50'} inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500`}
+                                        >
+                                            All Time
+                                        </button>
+
+                                    </div>
+
 
                                     <div className="space-x-2">
                                         <button
                                             onClick={decreaseMonth}
                                             disabled={prevMonthButtonDisabled}
                                             type="button"
-                                            className={`
-                              ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                              inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500
-                          `}
+                                            className={`${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'} inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500`}
                                         >
                                             <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
                                         </button>
@@ -109,10 +136,7 @@ export default function AllTransactionTable() {
                                             onClick={increaseMonth}
                                             disabled={nextMonthButtonDisabled}
                                             type="button"
-                                            className={`
-                              ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                              inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500
-                          `}
+                                            className={`${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500`}
                                         >
                                             <ChevronRightIcon className="w-5 h-5 text-gray-600" />
                                         </button>

@@ -15,8 +15,7 @@ interface orderState {
     addItems: (item: Items) => void
     removeItems: (item: Items) => void
     clearItems: () => void
-    // calculateTotal: () => number
-    // getOrders: () => Items[]
+
 }
 
 export const useOrderStore = create<orderState>()((set) => ({
