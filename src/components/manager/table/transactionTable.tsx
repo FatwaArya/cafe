@@ -36,7 +36,7 @@ export default function AllTransactionTable() {
         return (
             <div className='inline-block relative'>
 
-                <div className=''>
+                <div className='cursor-pointer'>
                     {date.getDate()}
                 </div>
                 {isTransaction && <span className="absolute top-[-4px] right-[-9px] block h-2 w-2 rounded-full ring-2 ring-white bg-red-400" />
@@ -120,8 +120,6 @@ export default function AllTransactionTable() {
 
 
                                 </div>
-
-
                             )}
                         />
 
