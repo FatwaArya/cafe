@@ -6,6 +6,7 @@ import Head from "next/head";
 import { useState } from "react";
 import { FcGoogle } from 'react-icons/fc';
 import { getServerAuthSession } from "../server/auth";
+import Image from "next/image";
 
 const Home: NextPage = () => {
   const [email, setEmail] = useState("")
@@ -19,7 +20,7 @@ const Home: NextPage = () => {
       <div className="h-screen bg-slate-50">
         <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8 ">
           <div className="sm:mx-auto sm:w-full sm:max-w-md">
-            <img
+            <Image
               className="mx-auto h-12 w-auto rotate-90"
               src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
               alt="Workflow"

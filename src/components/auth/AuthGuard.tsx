@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 interface IAuthGuardProps {
     children: React.ReactNode;
-    role?: string;
 }
 
 const AuthGuard: React.FC<IAuthGuardProps> = ({ children }) => {
@@ -15,7 +14,6 @@ const AuthGuard: React.FC<IAuthGuardProps> = ({ children }) => {
             router.push("/");
         }
     }, [sessionStatus]);
-
 
     if (["loading", "unauthenticated"].includes(sessionStatus)) {
         return (
