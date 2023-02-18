@@ -1,6 +1,8 @@
 import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { GetServerSidePropsContext } from "next";
+import { getServerAuthSession } from "../../server/auth";
 interface IAuthGuardProps {
     children: React.ReactNode;
     role?: string;
@@ -14,39 +16,14 @@ const AuthGuard: React.FC<IAuthGuardProps> = ({ children, role }) => {
         if (sessionStatus === "unauthenticated") {
             router.push("/");
         }
-        if (role === "CASHIER") {
-            if (session?.user?.role === "ADMIN") {
-                router.push("/admin");
+    }, [sessionStatus]);
 
-            }
-            if (session?.user?.role === "MANAGER") {
-                router.push("/manager");
-            }
-
-        }
-        if (role === "MANAGER") {
-            if (session?.user?.role === "ADMIN") {
-                router.push("/admin");
-            }
-            if (session?.user?.role === "CASHIER") {
-                router.push("/cashier");
-            }
-        }
-        if (role === "ADMIN") {
-            if (session?.user?.role === "MANAGER") {
-                router.push("/manager");
-            }
-            if (session?.user?.role === "CASHIER") {
-                router.push("/cashier");
-            }
-        }
-    }, [sessionStatus, session]);
 
     if (["loading", "unauthenticated"].includes(sessionStatus)) {
         return (
             <div className="flex h-screen items-center justify-center">
                 <svg
-                    className="-ml-1 mr-3 h-8 w-8 animate-spin text-red-500"
+                    className="-ml-1 mr-3 h-8 w-8 animate-spin text-indigo-500"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -71,4 +48,10 @@ const AuthGuard: React.FC<IAuthGuardProps> = ({ children, role }) => {
     return <>{children}</>;
 };
 
+
+
+
 export default AuthGuard;
+
+
+

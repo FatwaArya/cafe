@@ -5,7 +5,6 @@ import Link from 'next/link'
 
 export default function TransactionTable() {
     const { data: transactions } = api.cashier.getTransaction.useQuery()
-    console.log(transactions)
     return (
         <>
 
@@ -14,7 +13,7 @@ export default function TransactionTable() {
                     <div className="sm:flex-auto">
                         <h1 className="text-xl font-semibold text-gray-900">Overview</h1>
                         <p className="mt-2 text-sm text-gray-700">
-                            A list of all the transactions that have been made.
+                            A list of all the transactions that have been made by you.
                         </p>
                     </div>
                 </div>
@@ -71,7 +70,7 @@ export default function TransactionTable() {
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{transaction.createdAt.toLocaleDateString()}</td>
 
                                                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                                    <Link href={`/cashier/detail/${transaction.id}`} className="text-indigo-600 hover:text-indigo-900">
+                                                    <Link href={`/orders/detail/${transaction.id}`} className="text-indigo-600 hover:text-indigo-900">
                                                         Detail
                                                     </Link>
                                                 </td>

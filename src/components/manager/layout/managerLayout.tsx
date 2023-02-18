@@ -1,4 +1,3 @@
-/* This example requires Tailwind CSS v2.0+ */
 import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import {
@@ -20,16 +19,16 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-interface ICashierLayoutProps {
+interface IManagerLayoutProps {
     children: React.ReactNode
 }
 
-const CashierLayout: React.FC<ICashierLayoutProps> = ({ children }) => {
+const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
     const { data: session, status } = useSession()
 
-    if (status === 'loading') {
-        return <div>Loading...</div>
-    }
+    // if (status === 'loading') {
+    //     return <div>Loading...</div>
+    // }
 
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -37,16 +36,16 @@ const CashierLayout: React.FC<ICashierLayoutProps> = ({ children }) => {
     const [navigation, setNavigation] = useState([
         {
             name: "Overview",
-            href: "/cashier",
+            href: "/manager",
             icon: HomeIcon,
             current: false,
         },
-        {
-            name: "New Order",
-            href: "/cashier/new-order",
-            icon: DocumentPlusIcon,
-            current: false,
-        },
+        // {
+        //     name: "New Order",
+        //     href: "/cashier/new-order",
+        //     icon: DocumentPlusIcon,
+        //     current: false,
+        // },
         {
             name: "Sign Out",
             href: "/",
@@ -122,7 +121,7 @@ const CashierLayout: React.FC<ICashierLayoutProps> = ({ children }) => {
                                             width={32}
                                             height={32}
                                         />
-                                        <p className="text-2xl font-semibold mx-2">wikucashier</p>
+                                        <p className="text-2xl font-semibold mx-2">wikumanager</p>
                                     </div>
                                     <nav className="mt-5 px-2 space-y-1">
                                         {navigation.map((item) => (
@@ -196,7 +195,7 @@ const CashierLayout: React.FC<ICashierLayoutProps> = ({ children }) => {
                                     width={32}
                                     height={32}
                                 />
-                                <p className="text-2xl font-semibold mx-2">wikucashier</p>
+                                <p className="text-2xl font-semibold mx-2">wikumanager</p>
                             </div>
                             <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
                                 {navigation.map((item) => (
@@ -284,4 +283,4 @@ const CashierLayout: React.FC<ICashierLayoutProps> = ({ children }) => {
     )
 }
 
-export default CashierLayout
+export default ManagerLayout
