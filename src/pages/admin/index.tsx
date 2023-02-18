@@ -5,6 +5,7 @@ import { roleGuard } from "../../utils/roleGuard";
 import AdminLayout from "../../components/admin/layout/adminLayout";
 import { GetServerSidePropsContext } from "next";
 import UsersTable from "../../components/admin/table/usersTable";
+import WhitelistTable from "../../components/admin/table/whitelistTable";
 const Admin: WikuPage = () => {
     return (
         <>
