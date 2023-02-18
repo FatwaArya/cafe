@@ -96,6 +96,18 @@ export const createTRPCRouter = t.router;
  */
 export const publicProcedure = t.procedure;
 
+const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
+
 /**
  * Reusable middleware that enforces users are logged and are cashier before running the
  * procedure
@@ -157,6 +169,7 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
  *
  * @see https://trpc.io/docs/procedures
  */
+export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 export const cashierProcedure = t.procedure.use(enforceUserIsCashier);
 export const managerProcedure = t.procedure.use(enforceUserIsManager);
 export const adminProcedure = t.procedure.use(enforceUserIsAdmin);

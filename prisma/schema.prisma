@@ -61,6 +61,11 @@ enum MENU_TYPE {
     BEVERAGE
 }
 
+enum TABLE_STATUS {
+    AVAILABLE
+    OCCUPIED
+}
+
 model VerificationToken {
     identifier String
     token      String   @unique
@@ -84,6 +89,7 @@ model User {
 model Table {
     id          String        @id @default(cuid())
     number      String
+    status      TABLE_STATUS  @default(AVAILABLE)
     Transaction Transaction[]
 }
 
@@ -98,20 +104,36 @@ model Menu {
 }
 
 model Transaction {
-    id              String   @id @default(cuid())
-    transactionDate DateTime
-    status          STATUS   @default(NOT_PAID)
-    table           Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
-    tableId         String
-    menu            Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
-    menuId          String
-    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId          String
-    cutomerName     String
+    id                  String             @id @default(cuid())
+    status              STATUS             @default(NOT_PAID)
+    table               Table              @relation(fields: [tableId], references: [id], onDelete: Cascade)
+    tableId             String
+    menu                Menu               @relation(fields: [menuId], references: [id], onDelete: Cascade)
+    menuId              String
+    user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId              String
+    customerName        String
+    quantity            Int
+    createdAt           DateTime           @default(now())
+    updatedAt           DateTime           @updatedAt
+    TransactionDetail   TransactionDetail? @relation(fields: [transactionDetailId], references: [id])
+    transactionDetailId String?
 
     @@index([tableId])
     @@index([menuId])
     @@index([userId])
+    @@index([transactionDetailId])
+}
+
+model TransactionDetail {
+    id                String        @id @default(cuid())
+    transactionNumber String
+    total             Int
+    createdAt         DateTime      @default(now())
+    updatedAt         DateTime      @updatedAt
+    transaction       Transaction[]
+
+    @@index([id])
 }
 
 //make whitelist model for user
