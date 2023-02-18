@@ -40,6 +40,7 @@ export async function roleGuard(
         },
       };
     }
+    //@ts-ignore
     const redirectDestination = roleRedirects[role][session.user?.role as string];
     if (redirectDestination) {
       return {
