@@ -4,10 +4,11 @@ import { ReactElement } from "react";
 import { roleGuard } from "../../utils/roleGuard";
 import AdminLayout from "../../components/admin/layout/adminLayout";
 import { GetServerSidePropsContext } from "next";
+import UsersTable from "../../components/admin/table/usersTable";
 const Admin: WikuPage = () => {
     return (
         <>
-            <h1>Admin</h1>
+            <UsersTable />
         </>
     )
 }
