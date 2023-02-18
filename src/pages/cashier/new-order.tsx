@@ -3,6 +3,8 @@ import CashierLayout from "../../components/cashier/layout/cashierLayout";
 import { WikuPage } from "../_app";
 import ItemList from "../../components/cashier/items/itemList";
 import Head from "next/head";
+import { GetServerSidePropsContext } from "next";
+import { roleGuard } from "../../utils/roleGuard";
 
 
 const NewOrder: WikuPage = () => {
@@ -22,19 +24,18 @@ NewOrder.getLayout = function getLayout(page: ReactElement) {
 };
 
 NewOrder.authRequired = true;
-NewOrder.role = "cashier";
 
 export default NewOrder
 
 //prevent other roles from accessing this page
 
-// export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-//     return roleGuard(ctx, (session: any) => ({
-//         props: {
-//             session,
-//         },
-//     }), "cashier")
-// }
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+    return roleGuard(ctx, (session: any) => ({
+        props: {
+            session,
+        },
+    }), "cashier")
+}
 
 
 

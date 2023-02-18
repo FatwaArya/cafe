@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 
-import { createTRPCRouter, cashierProcedure } from "../trpc";
+import {
+  createTRPCRouter,
+  cashierProcedure,
+  protectedProcedure,
+} from "../trpc";
 
 export const cashierRouter = createTRPCRouter({
   getsMenu: cashierProcedure.query(async ({ ctx }) => {
@@ -45,7 +49,7 @@ export const cashierRouter = createTRPCRouter({
 
     return transactions;
   }),
-  getDetailTransactionById: cashierProcedure
+  getDetailTransactionById: protectedProcedure
     .input(
       z.object({
         id: z.string(),

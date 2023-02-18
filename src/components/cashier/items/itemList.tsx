@@ -1,72 +1,32 @@
 
-import { StarIcon } from '@heroicons/react/24/solid'
 import { api } from '../../../utils/api'
 import Image from 'next/image'
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, Listbox } from '@headlessui/react'
 import { XMarkIcon, CheckIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline'
+import { Items, useOrderStore } from '../../../store/orderStore'
 
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-interface Items {
-    id: string
-    name: string
-    price: string
-    image: string
-    desc: string
-    type: string
-    quantity: number
-}
 
 export default function ItemList() {
     const { data: items } = api.cashier.getsMenu.useQuery()
     const { data: tables } = api.cashier.getsTable.useQuery()
     const utils = api.useContext()
-    //track the selected item
-    const [selectedItem, setSelectedItem] = useState<Items[]>([])
     const [open, setOpen] = useState(false)
     const [customerName, setCustomerName] = useState('')
     const [selected, setSelected] = useState(tables?.[0])
-
-
-
-    //if product is already in cart, increase quantity
-    const handleAddToCart = (item: Items) => {
-        const isItemInCart = selectedItem.find((cartItem) => cartItem.id === item.id)
-        if (isItemInCart) {
-            setSelectedItem(
-                selectedItem.map((cartItem) =>
-                    cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem
-                )
-            )
-        } else {
-            setSelectedItem([...selectedItem, { ...item, quantity: 1 }])
-        }
-    }
-
-    //remove item from cart
-    const handleRemoveFromCart = (id: string) => {
-        //remove only one item
-        const isItemInCart = selectedItem.find((cartItem) => cartItem.id === id)
-        if (isItemInCart?.quantity === 1) {
-            setSelectedItem(selectedItem.filter((cartItem) => cartItem.id !== id))
-        }
-        //remove all items
-        if (isItemInCart?.quantity! > 1) {
-            setSelectedItem(
-                selectedItem.map((cartItem) =>
-                    cartItem.id === id ? { ...cartItem, quantity: cartItem.quantity - 1 } : cartItem
-                )
-            )
-        }
-    }
+    const orders = useOrderStore((state) => state.items)
+    const addOrder = useOrderStore((state) => state.addItems)
+    const removeOrder = useOrderStore((state) => state.removeItems)
+    const clearOrder = useOrderStore((state) => state.clearItems)
 
     //calculate total price
     const calculateTotalPrice = () => {
-        return selectedItem.reduce((ack: number, item) => ack + item.quantity * parseInt(item.price), 0)
+        return orders.reduce((ack: number, item) => ack + item.quantity * parseInt(item.price), 0)
     }
     //total price
     const total = calculateTotalPrice()
@@ -74,13 +34,12 @@ export default function ItemList() {
     const createOrder = api.cashier.createOrder.useMutation({
         onSuccess: () => {
             utils.cashier.getTransaction.invalidate();
-            setSelectedItem([])
             setOpen(false)
+            clearOrder()
         }
     })
     const handleCreateOrder = () => {
-        //extract the id 
-        const order = selectedItem.map((item) => ({
+        const order = orders.map((item) => ({
             menuId: item.id,
             quantity: item.quantity,
         }))
@@ -107,9 +66,9 @@ export default function ItemList() {
                     <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
                         <button
                             onClick={() => setOpen(true)}
-                            disabled={selectedItem.length === 0}
+                            disabled={orders.length === 0}
                             type="button"
-                            className={classNames(selectedItem.length === 0 ? 'bg-gray-300' : 'bg-indigo-600', 'px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  float-right')}
+                            className={classNames(orders.length === 0 ? 'bg-gray-300' : 'bg-indigo-600', 'px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  float-right')}
                         >
                             open cart
                         </button>
@@ -149,8 +108,7 @@ export default function ItemList() {
                                 </div>
                                 <button
                                     onClick={() => {
-                                        //apppend the selected item id to the cart
-                                        handleAddToCart(product as Items)
+                                        addOrder(product as Items)
                                     }}
                                     type="button"
                                     className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 float-right "
@@ -209,7 +167,7 @@ export default function ItemList() {
                                                 <div className="mt-8">
                                                     <div className="flow-root">
                                                         <ul role="list" className="-my-6 divide-y divide-gray-200">
-                                                            {selectedItem.map((product) => (
+                                                            {orders.map((product) => (
                                                                 <li key={product.id} className="flex py-6">
                                                                     <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                                                         <Image
@@ -243,7 +201,7 @@ export default function ItemList() {
                                                                             <div className="flex">
                                                                                 <button
                                                                                     onClick={() => {
-                                                                                        handleRemoveFromCart(product.id)
+                                                                                        removeOrder(product as Items)
                                                                                     }}
                                                                                     type="button"
                                                                                     className="font-medium text-indigo-600 hover:text-indigo-500"
