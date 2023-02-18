@@ -82,7 +82,7 @@ const Home: NextPage = () => {
                 <div className="mt-6 grid grid-cols-1 gap-1">
                   <div>
                     <button
-                      onClick={() => signIn("discord")}
+                      onClick={() => signIn("google")}
                       className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                     >
                       <FcGoogle className="text-xl" />
