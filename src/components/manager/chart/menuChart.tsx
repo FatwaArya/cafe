@@ -4,6 +4,8 @@ import { Pie } from 'react-chartjs-2';
 import { api } from '../../../utils/api';
 import { useEffect, useState, useMemo } from 'react';
 import { useOrderDateStore } from '../../../store/orderDateStore';
+import { formatISO9075 } from 'date-fns';
+
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface IStats {
@@ -15,44 +17,12 @@ interface IStats {
 
 export default function MenuChart() {
     const startDate = useOrderDateStore(state => state.order.date)
-
-    const newStartDate = startDate?.toISOString() as string
+    const newStartDate = startDate?.toISOString() || undefined
+    const { data: stats } = api.manager.getStatistic.useQuery({ date: newStartDate })
     console.log(newStartDate)
-    const { data: stats } = api.manager.getStatistic.useQuery(
-        { date: newStartDate },
-    )
     const allTime = useOrderDateStore(state => state.order.allOrders)
     const [filteredStats, setFilteredStats] = useState(stats)
     console.log(filteredStats)
-
-    // useEffect(() => {
-    //     const sortedByDate = stats?.filter((stat) => {
-    //         const date = stat.createdAt
-    //         return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
-    //     })
-    //     const newFiltered = sortedByDate?.reduce((acc: any[], cur) => {
-    //         const existingItem = acc.find((item) => item.name === cur.name)
-    //         if (existingItem) {
-    //             existingItem.quantity += cur.quantity
-    //         } else {
-    //             acc.push(cur)
-    //         }
-    //         return acc
-    //     }, [])
-
-
-    //     return stats?.reduce((acc: any[], cur) => {
-    //         const index = acc.findIndex((item) => item.name === cur.name)
-    //         if (index === -1) {
-    //             acc.push(cur)
-    //         } else {
-    //             acc[index].quantity += cur.quantity
-    //         }
-    //         return acc
-    //     }, [])
-
-
-    // }, [startDate, stats, allTime]);
 
     useEffect(() => {
         const newFilteredAllTime = stats?.reduce((acc: any[], cur) => {
@@ -95,7 +65,7 @@ export default function MenuChart() {
                     'rgba(153, 102, 255, 1)',
                     'rgba(255, 159, 64, 1)',
                 ],
-                borderWidth: 1,
+                borderWidth: 2,
             }
         ]
     }
@@ -103,8 +73,9 @@ export default function MenuChart() {
 
 
     return (<>
-        {filteredStats && <Pie data={data} />}
-
+        <div className='w-auto h-96'>
+            {filteredStats && <Pie data={data} />}
+        </div>
     </>)
 }
 

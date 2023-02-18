@@ -3,14 +3,14 @@ import { api } from '../../../utils/api'
 import Link from 'next/link'
 import { AdjustmentsHorizontalIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import DatePicker from 'react-datepicker'
-import { format, getDate } from 'date-fns'
+import { format, formatISO, formatISO9075 } from 'date-fns'
 import { useOrderDateStore } from '../../../store/orderDateStore'
 
 
 export default function AllTransactionTable() {
     const [searchField, setSearchField] = useState('')
     const startDate = useOrderDateStore(state => state.order.date)
-    const newStartDate = startDate?.toISOString() as string
+    const newStartDate = startDate?.toISOString() || undefined
     const { data: transactions } = api.manager.getTransaction.useQuery(
         { date: newStartDate },
     )
