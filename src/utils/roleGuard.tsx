@@ -1,5 +1,5 @@
-import { getServerAuthSession } from "../server/auth";
 import { GetServerSidePropsContext } from "next";
+import { getServerAuthSession } from "../server/auth";
 
 export async function roleGuard(
     ctx: GetServerSidePropsContext,
