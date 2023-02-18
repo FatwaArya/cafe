@@ -24,6 +24,8 @@ const Home: NextPage = () => {
               className="mx-auto h-12 w-auto rotate-90"
               src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
               alt="Workflow"
+              height={48}
+              width={48}
             />
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
 
