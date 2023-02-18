@@ -27,10 +27,6 @@ interface ICashierLayoutProps {
 const CashierLayout: React.FC<ICashierLayoutProps> = ({ children }) => {
     const { data: session, status } = useSession()
 
-    if (status === 'loading') {
-        return <div>Loading...</div>
-    }
-
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
 

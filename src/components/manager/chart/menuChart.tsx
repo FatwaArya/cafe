@@ -8,9 +8,9 @@ import { api } from '../../../utils/api';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface IStats {
-    name: string
-    quantity: number
-    createdAt: Date
+    name: string | undefined;
+    quantity: number | null | undefined;
+    createdAt: Date | undefined;
 }
 
 
@@ -49,12 +49,13 @@ export default function MenuChart() {
     })
 
     useEffect(() => {
-        const newFilteredAllTime = stats?.reduce((acc: any[], cur) => {
+        const newFilteredAllTime = stats?.reduce((acc: IStats[], cur: IStats) => {
             const index = acc.findIndex((item) => item.name === cur.name)
             if (index === -1) {
                 acc.push(cur)
             } else {
-                acc[index].quantity += cur.quantity
+                let quantity = acc?.[index]?.quantity as number
+                quantity += cur.quantity as number
             }
             return acc
         }, [])
