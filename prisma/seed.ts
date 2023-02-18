@@ -1,16 +1,34 @@
 //seed email whitelist
-
+import { faker } from "@faker-js/faker";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = await prisma.whitelistEmail.create({
+  //create table and product and then create transaction using faker
+
+  await prisma.whitelistEmail.create({
     data: {
-      email: "fatwastaruz@gmail.com",
+      email: "fatwaaryasatyaakbar@gmail.com",
     },
   });
-  console.log({ email });
+
+  // for (let i = 0; i < 10; i++) {
+  //   await prisma.table.create({
+  //     data: {
+  //       number: faker.random.numeric(2),
+  //     },
+  //   });
+
+  //   await prisma.menu.create({
+  //     data: {
+  //       name: faker.commerce.productName(),
+  //       price: faker.finance.amount(10000, 100000, 2),
+  //       desc: faker.commerce.productDescription(),
+  //       image: faker.image.food(1234, 2345, true),
+  //     },
+  //   });
+  // }
 }
 
 main()
