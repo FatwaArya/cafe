@@ -11,7 +11,6 @@ export const managerRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const { date } = input;
-
       const transactions = await ctx.prisma.transactionDetail.findMany({
         include: {
           transaction: {

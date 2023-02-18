@@ -6,10 +6,17 @@ import AdminLayout from "../../components/admin/layout/adminLayout";
 import { GetServerSidePropsContext } from "next";
 import UsersTable from "../../components/admin/table/usersTable";
 import WhitelistTable from "../../components/admin/table/whitelistTable";
+import Head from "next/head";
 const Admin: WikuPage = () => {
     return (
         <>
-            <UsersTable />
+            <Head>
+                <title>Admin | Overview</title>
+            </Head>
+            <div className="px-4 sm:px-6 lg:px-8">
+                <UsersTable />
+                <WhitelistTable />
+            </div>
         </>
     )
 }

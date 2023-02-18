@@ -11,6 +11,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Fragment, useEffect, useState } from 'react'
+import { Loader } from '../../auth/AuthGuard'
 
 
 
@@ -63,6 +64,8 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
             setNavigation(newNavigation);
         }
     }, [asPath]);
+    if (status === "loading") { return <Loader /> }
+
 
     return (
         <>

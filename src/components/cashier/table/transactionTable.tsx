@@ -1,9 +1,13 @@
 import Link from 'next/link'
 import { api } from '../../../utils/api'
+import { Loader } from '../../auth/AuthGuard'
 
 
 export default function TransactionTable() {
-    const { data: transactions } = api.cashier.getTransaction.useQuery()
+    const { data: transactions, status } = api.cashier.getTransaction.useQuery()
+
+    if (status === "loading") { return <Loader /> }
+
     return (
         <>
 

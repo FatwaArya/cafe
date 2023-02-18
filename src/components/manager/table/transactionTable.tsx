@@ -5,13 +5,14 @@ import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import { useOrderDateStore } from '../../../store/orderDateStore'
 import { api } from '../../../utils/api'
+import { Loader } from '../../auth/AuthGuard'
 
 
 export default function AllTransactionTable() {
     const [searchField, setSearchField] = useState('')
     const startDate = useOrderDateStore(state => state.order.date)
-    const newStartDate = startDate?.toISOString() || undefined
-    const { data: transactions } = api.manager.getTransaction.useQuery(
+    const newStartDate = new Date(startDate?.toISOString().slice(0, 10) + 'T00:00:00.000Z').toISOString()
+    const { data: transactions, status } = api.manager.getTransaction.useQuery(
         { date: newStartDate },
     )
     const { data: transactionsDate } = api.manager.getTransaction.useQuery({})
@@ -41,6 +42,7 @@ export default function AllTransactionTable() {
         }
     }, [startDate, transactions, allTime])
 
+
     const renderDayContents = (day: any, date: any) => {
         const isTransaction = transactionsDate?.some((transaction) => {
             return transaction.transaction[0]?.createdAt?.getDate() === date.getDate() && transaction.transaction[0]?.createdAt?.getMonth() === date.getMonth() && transaction.transaction[0]?.createdAt?.getFullYear() === date.getFullYear()
@@ -58,10 +60,10 @@ export default function AllTransactionTable() {
         );
     };
 
+    if (status === "loading") { return <Loader /> }
 
     return (
         <>
-
             <div className="px-4 sm:px-6 lg:px-8">
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">
@@ -72,7 +74,7 @@ export default function AllTransactionTable() {
                     </div>
                 </div>
                 <div className='flex justify-between'>
-                    <div className="mt-3 relative rounded-md shadow-sm">
+                    <div className="mt-3 relative rounded-md shadow-sm mr-3">
                         <input
 
                             className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -82,9 +84,7 @@ export default function AllTransactionTable() {
                             }}
                             placeholder='Search by name'
                         />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer  ">
-                            <AdjustmentsHorizontalIcon className="h-5 w-5 text-gray-400 " aria-hidden="true" onClick={() => { }} />
-                        </div>
+
                     </div>
                     <div className="mt-3 relative rounded-md shadow-sm">
                         <DatePicker

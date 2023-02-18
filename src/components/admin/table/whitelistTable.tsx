@@ -1,9 +1,21 @@
 import { api } from "../../../utils/api"
+import { Loader } from "../../auth/AuthGuard"
 
 
 
 export default function WhitelistTable() {
-    const { data: users } = api.admin.getWhitelist.useQuery()
+    const utils = api.useContext()
+    const { data: users, status } = api.admin.getWhitelist.useQuery()
+    const deleteWhitelist = api.admin.deleteWhitelist.useMutation(
+        {
+            onSuccess: () => {
+                utils.admin.getWhitelist.invalidate()
+            }
+        }
+    )
+
+    if (status === "loading") { return <Loader /> }
+
 
     return (
         <>
@@ -25,7 +37,9 @@ export default function WhitelistTable() {
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                                 Email
                                             </th>
-
+                                            <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                                <span className="sr-only">Edit</span>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white">
@@ -36,7 +50,17 @@ export default function WhitelistTable() {
                                                 </td>
 
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.email}</td>
-
+                                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                                    <button className="text-red-600 hover:text-red-700"
+                                                        onClick={() => {
+                                                            deleteWhitelist.mutate({
+                                                                email: person.email
+                                                            })
+                                                        }}
+                                                    >
+                                                        Delete<span className="sr-only">, {person.email}</span>
+                                                    </button>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
