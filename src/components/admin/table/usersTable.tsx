@@ -330,7 +330,6 @@ export default function UsersTable() {
                 </button>
             </div>
 
-
         </div>
         <div className="mt-3 relative rounded-md shadow-sm">
             <input

@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import {
     ArrowRightOnRectangleIcon,
     Bars3Icon,
-    DocumentPlusIcon,
+    CakeIcon,
     HomeIcon,
     UserCircleIcon,
     XMarkIcon
@@ -38,12 +38,12 @@ const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
             icon: HomeIcon,
             current: false,
         },
-        // {
-        //     name: "New Order",
-        //     href: "/cashier/new-order",
-        //     icon: DocumentPlusIcon,
-        //     current: false,
-        // },
+        {
+            name: "New menu",
+            href: "/admin/new-menu",
+            icon: CakeIcon,
+            current: false,
+        },
         {
             name: "Sign Out",
             href: "/",
@@ -160,7 +160,7 @@ const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
                                                 <Image
                                                     className="inline-block  w-10 rounded-full h-10"
                                                     src={session?.user?.image || ""}
-                                                    alt=""
+                                                    alt="user profile picture"
                                                     width={40}
                                                     height={40}
                                                 />
@@ -224,13 +224,17 @@ const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
                             <div className="flex-shrink-0 w-full group block">
                                 <div className="flex items-center">
                                     <div>
-                                        <Image
-                                            className="inline-block  w-10 rounded-full h-10"
-                                            src={session?.user?.image || ""}
-                                            alt=""
-                                            width={40}
-                                            height={40}
-                                        />
+                                        {session?.user?.image ? (
+
+                                            <Image
+                                                className="inline-block h-auto w-10 rounded-full"
+                                                src={session.user?.image || ""}
+                                                alt=""
+                                                width={40}
+                                                height={40}
+                                            />) : (
+                                            <UserCircleIcon className="inline-block h-10 w-10 rounded-full" />)}
+
                                     </div>
                                     <div className="ml-3">
                                         <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{session?.user?.name}</p>
