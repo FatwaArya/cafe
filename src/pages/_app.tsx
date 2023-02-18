@@ -35,7 +35,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <SessionProvider session={session}>
       {
         authRequired && role ? (
-          <AuthGuard role={role}>
+          <AuthGuard >
             {getLayout(<Component {...pageProps} />)}
           </AuthGuard>
         ) : (

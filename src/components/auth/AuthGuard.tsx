@@ -6,8 +6,8 @@ interface IAuthGuardProps {
     role?: string;
 }
 
-const AuthGuard: React.FC<IAuthGuardProps> = ({ children, role }) => {
-    const { data: session, status: sessionStatus } = useSession();
+const AuthGuard: React.FC<IAuthGuardProps> = ({ children }) => {
+    const { status: sessionStatus } = useSession();
     const router = useRouter();
 
     useEffect(() => {
