@@ -1,11 +1,11 @@
 
+import { GetServerSidePropsContext } from "next";
+import Head from "next/head";
 import { ReactElement } from "react";
 import CashierLayout from "../../components/cashier/layout/cashierLayout";
-import { WikuPage } from "../_app";
 import TransactionTable from "../../components/cashier/table/transactionTable";
-import Head from "next/head";
-import { GetServerSidePropsContext } from "next";
 import { roleGuard } from "../../utils/roleGuard";
+import { WikuPage } from "../_app";
 
 const Cashier: WikuPage = () => {
 

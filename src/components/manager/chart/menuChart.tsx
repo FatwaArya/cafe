@@ -1,9 +1,9 @@
 
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
-import { api } from '../../../utils/api';
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
 import { useEffect, useState, } from 'react';
+import { Pie } from 'react-chartjs-2';
 import { useOrderDateStore } from '../../../store/orderDateStore';
+import { api } from '../../../utils/api';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

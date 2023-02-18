@@ -1,8 +1,6 @@
-import { signIn, useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { GetServerSidePropsContext } from "next";
-import { getServerAuthSession } from "../../server/auth";
+import { useEffect } from "react";
 interface IAuthGuardProps {
     children: React.ReactNode;
     role?: string;

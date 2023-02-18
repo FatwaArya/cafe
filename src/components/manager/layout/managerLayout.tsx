@@ -1,17 +1,16 @@
-import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import {
-    HomeIcon,
-    Bars3Icon,
-    XMarkIcon,
     ArrowRightOnRectangleIcon,
+    Bars3Icon,
+    HomeIcon,
     UserCircleIcon,
-    DocumentPlusIcon
+    XMarkIcon
 } from '@heroicons/react/24/outline'
 import { signOut, useSession } from 'next-auth/react'
-import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { Fragment, useEffect, useState } from 'react'
 
 
 

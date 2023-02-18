@@ -1,11 +1,11 @@
 import { GetServerSidePropsContext, type NextPage } from "next";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
-import { getServerAuthSession } from "../server/auth";
-import { FcGoogle } from 'react-icons/fc'
-import { useState, useEffect } from "react";
 import Head from "next/head";
+import { useState } from "react";
+import { FcGoogle } from 'react-icons/fc';
+import { getServerAuthSession } from "../server/auth";
 
 const Home: NextPage = () => {
   const [email, setEmail] = useState("")

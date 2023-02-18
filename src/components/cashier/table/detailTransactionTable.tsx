@@ -1,7 +1,7 @@
-import Image from "next/image"
-import { api } from "../../../utils/api"
-import Link from "next/link"
 import { ArrowLeftIcon } from "@heroicons/react/24/solid"
+import Image from "next/image"
+import Link from "next/link"
+import { api } from "../../../utils/api"
 
 
 const DetailTransactionTable = ({ id }: { id: string }) => {

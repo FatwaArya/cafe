@@ -1,11 +1,7 @@
-import { useRouter } from "next/router";
-import { WikuPage } from "../../_app";
-import DetailTransactionTable from "../../../components/cashier/table/detailTransactionTable";
-import CashierLayout from "../../../components/cashier/layout/cashierLayout";
-import { ReactElement } from "react";
 import Head from "next/head";
-import { GetServerSidePropsContext } from "next";
-import { roleGuard } from "../../../utils/roleGuard";
+import { useRouter } from "next/router";
+import DetailTransactionTable from "../../../components/cashier/table/detailTransactionTable";
+import { WikuPage } from "../../_app";
 
 
 const DetailOrder: WikuPage = () => {

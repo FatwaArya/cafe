@@ -1,12 +1,11 @@
-import { GetServerSidePropsContext, NextPage } from "next";
-import { signOut } from "next-auth/react";
-import { WikuPage } from "../_app";
-import ManagerLayout from "../../components/manager/layout/managerLayout";
-import { ReactElement } from "react";
-import { roleGuard } from "../../utils/roleGuard";
-import AllTransactionTable from "../../components/manager/table/transactionTable";
-import MenuChart from "../../components/manager/chart/menuChart";
+import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
+import { ReactElement } from "react";
+import MenuChart from "../../components/manager/chart/menuChart";
+import ManagerLayout from "../../components/manager/layout/managerLayout";
+import AllTransactionTable from "../../components/manager/table/transactionTable";
+import { roleGuard } from "../../utils/roleGuard";
+import { WikuPage } from "../_app";
 
 const Manager: WikuPage = () => {
 

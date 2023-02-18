@@ -1,16 +1,16 @@
-import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import { type AppType } from "next/app";
 
 
-import type { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
+import type { ReactElement, ReactNode } from "react";
 
 import { api } from "../utils/api";
 
-import "../styles/globals.css";
 import AuthGuard from "../components/auth/AuthGuard";
+import "../styles/globals.css";
 
 
 export type WikuPage<P = {}, IP = P> = NextPage<P, IP> & {
