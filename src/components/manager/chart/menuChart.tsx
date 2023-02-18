@@ -4,6 +4,7 @@ import { useEffect, useState, } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { useOrderDateStore } from '../../../store/orderDateStore';
 import { api } from '../../../utils/api';
+import { Loader } from '../../auth/AuthGuard';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -16,9 +17,8 @@ interface IStats {
 
 export default function MenuChart() {
     const startDate = useOrderDateStore(state => state.order.date)
-    const newStartDate = startDate?.toISOString() || undefined
-    const { data: stats } = api.manager.getStatistic.useQuery({ date: newStartDate })
-    console.log(newStartDate)
+    const newStartDate = new Date(startDate?.toISOString().slice(0, 10) + 'T00:00:00.000Z').toISOString()
+    const { data: stats, status } = api.manager.getStatistic.useQuery({ date: newStartDate })
     const allTime = useOrderDateStore(state => state.order.allOrders)
     const [filteredStats, setFilteredStats] = useState(stats)
     const [chartData, setChartData] = useState({
@@ -60,6 +60,24 @@ export default function MenuChart() {
             return acc
         }, [])
 
+        const sortedByDate = stats?.filter((stat) => {
+            const date = stat.createdAt
+            return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
+        })
+
+        const newFilteredByDate = sortedByDate?.reduce((acc: IStats[], cur: IStats) => {
+            const index = acc.findIndex((item) => item.name === cur.name)
+            if (index === -1) {
+                acc.push(cur)
+            } else {
+                let quantity = acc?.[index]?.quantity as number
+                quantity += cur.quantity as number
+            }
+            return acc
+        }, [])
+
+
+
         if (allTime) {
             setFilteredStats(newFilteredAllTime)
             setChartData({
@@ -89,13 +107,13 @@ export default function MenuChart() {
                 ]
             })
         } else {
-            setFilteredStats(stats)
+            setFilteredStats(newFilteredByDate)
             setChartData({
-                labels: stats?.map((menu) => menu.name),
+                labels: newFilteredByDate?.map((menu) => menu.name),
                 datasets: [
                     {
                         label: 'Number of Orders',
-                        data: stats?.map((menu) => menu.quantity),
+                        data: newFilteredByDate?.map((menu) => menu.quantity),
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
@@ -118,7 +136,9 @@ export default function MenuChart() {
             })
         }
     }, [startDate, stats, allTime])
+    console.log(newStartDate)
 
+    if (status === "loading") { return <Loader /> }
 
     return (<>
         {filteredStats && <>

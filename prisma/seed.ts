@@ -9,26 +9,26 @@ async function main() {
 
   await prisma.whitelistEmail.create({
     data: {
-      email: "fatwaaryasatyaakbar@gmail.com",
+      email: "Melfirasyahnazz@gmail.com",
     },
   });
 
-  for (let i = 0; i < 10; i++) {
-    await prisma.table.create({
-      data: {
-        number: faker.random.numeric(2),
-      },
-    });
+  // for (let i = 0; i < 10; i++) {
+  //   await prisma.table.create({
+  //     data: {
+  //       number: faker.random.numeric(2),
+  //     },
+  //   });
 
-    await prisma.menu.create({
-      data: {
-        name: faker.commerce.productName(),
-        price: faker.finance.amount(10000, 100000, 2),
-        desc: faker.commerce.productDescription(),
-        image: faker.image.food(1234, 2345, true),
-      },
-    });
-  }
+  //   await prisma.menu.create({
+  //     data: {
+  //       name: faker.commerce.productName(),
+  //       price: faker.finance.amount(10000, 100000, 2),
+  //       desc: faker.commerce.productDescription(),
+  //       image: faker.image.food(1234, 2345, true),
+  //     },
+  //   });
+  // }
 }
 
 main()

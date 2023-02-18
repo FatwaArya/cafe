@@ -1,77 +1,63 @@
 import { GetServerSidePropsContext } from "next";
 import { getServerAuthSession } from "../server/auth";
+import { Session } from "next-auth";
+
+type Callback = (data: { session: Session }) => void;
+
+type RoleRedirects = {
+  [key: string]: {
+    [key: string]: string;
+  };
+};
+
+const roleRedirects: RoleRedirects = {
+  cashier: {
+    ADMIN: "/admin",
+    MANAGER: "/manager",
+  },
+  manager: {
+    ADMIN: "/admin",
+    CASHIER: "/cashier",
+  },
+  admin: {
+    MANAGER: "/manager",
+    CASHIER: "/cashier",
+  },
+};
 
 export async function roleGuard(
-    ctx: GetServerSidePropsContext,
-    cb: any,
-    role: string
+  ctx: GetServerSidePropsContext,
+  cb: Callback,
+  role: string
 ) {
+  try {
     const session = await getServerAuthSession(ctx);
     if (!session) {
-        return {
-            redirect: {
-                destination: "/",
-                permanent: false,
-            },
-        };
+      return {
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      };
     }
-
-    if (role === "cashier") {
-        if (session.user?.role === "ADMIN") {
-            return {
-                redirect: {
-                    destination: "/admin",
-                    permanent: false,
-                },
-            };
-        }
-        if (session.user?.role === "MANAGER") {
-            return {
-                redirect: {
-                    destination: "/manager",
-                    permanent: false,
-                },
-            };
-        }
-    }
-
-    if (role === "manager") {
-        if (session.user?.role === "ADMIN") {
-            return {
-                redirect: {
-                    destination: "/admin",
-                    permanent: false,
-                },
-            };
-        }
-        if (session.user?.role === "CASHIER") {
-            return {
-                redirect: {
-                    destination: "/cashier",
-                    permanent: false,
-                },
-            };
-        }
-    }
-
-    if (role === "admin") {
-        if (session.user?.role === "MANAGER") {
-            return {
-                redirect: {
-                    destination: "/manager",
-                    permanent: false,
-                },
-            };
-        }
-        if (session.user?.role === "CASHIER") {
-            return {
-                redirect: {
-                    destination: "/cashier",
-                    permanent: false,
-                },
-            };
-        }
+    //@ts-ignore
+    const redirectDestination = roleRedirects[role][session.user?.role as string];
+    if (redirectDestination) {
+      return {
+        redirect: {
+          destination: redirectDestination,
+          permanent: false,
+        },
+      };
     }
 
     return cb({ session });
+  } catch (error) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
 }

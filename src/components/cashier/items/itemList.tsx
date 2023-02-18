@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Fragment, useState } from 'react'
 import { Items, useOrderStore } from '../../../store/orderStore'
 import { api } from '../../../utils/api'
+import { Loader } from '../../auth/AuthGuard'
 
 
 function classNames(...classes: string[]) {
@@ -13,7 +14,7 @@ function classNames(...classes: string[]) {
 
 
 export default function ItemList() {
-    const { data: items } = api.cashier.getsMenu.useQuery()
+    const { data: items, status } = api.cashier.getsMenu.useQuery()
     const { data: tables } = api.cashier.getsTable.useQuery()
     const utils = api.useContext()
     const [open, setOpen] = useState(false)
@@ -52,6 +53,7 @@ export default function ItemList() {
         })
     }
 
+    if (status === "loading") { return <Loader /> }
 
     return (
         <>

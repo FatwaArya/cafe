@@ -7,28 +7,27 @@ import { GetServerSidePropsContext } from "next";
 import UsersTable from "../../components/admin/table/usersTable";
 import WhitelistTable from "../../components/admin/table/whitelistTable";
 import Head from "next/head";
-const Admin: WikuPage = () => {
+const NewMenu: WikuPage = () => {
     return (
         <>
             <Head>
                 <title>Admin | Overview</title>
             </Head>
             <div className="px-4 sm:px-6 lg:px-8">
-                <UsersTable />
-                <WhitelistTable />
+                menu
             </div>
         </>
     )
 }
 
-export default Admin
+export default NewMenu
 
 
 
-Admin.getLayout = function getLayout(page: ReactElement) {
+NewMenu.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>
 };
-Admin.authRequired = true;
+NewMenu.authRequired = true;
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return roleGuard(ctx, (session: any) => ({
         props: {

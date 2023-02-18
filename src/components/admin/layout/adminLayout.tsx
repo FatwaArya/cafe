@@ -1,7 +1,9 @@
+/* This example requires Tailwind CSS v2.0+ */
 import { Dialog, Transition } from '@headlessui/react'
 import {
     ArrowRightOnRectangleIcon,
     Bars3Icon,
+    CakeIcon,
     HomeIcon,
     UserCircleIcon,
     XMarkIcon
@@ -19,16 +21,12 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-interface IManagerLayoutProps {
+interface IAdminLayoutProps {
     children: React.ReactNode
 }
 
-const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
+const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
     const { data: session, status } = useSession()
-
-    // if (status === 'loading') {
-    //     return <div>Loading...</div>
-    // }
 
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -36,16 +34,16 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
     const [navigation, setNavigation] = useState([
         {
             name: "Overview",
-            href: "/manager",
+            href: "/admin",
             icon: HomeIcon,
             current: false,
         },
-        // {
-        //     name: "New Order",
-        //     href: "/cashier/new-order",
-        //     icon: DocumentPlusIcon,
-        //     current: false,
-        // },
+        {
+            name: "New menu",
+            href: "/admin/new-menu",
+            icon: CakeIcon,
+            current: false,
+        },
         {
             name: "Sign Out",
             href: "/",
@@ -64,8 +62,8 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
             setNavigation(newNavigation);
         }
     }, [asPath]);
-    if (status === "loading") { return <Loader /> }
 
+    if (status === "loading") { return <Loader /> }
 
     return (
         <>
@@ -123,7 +121,7 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
                                             width={32}
                                             height={32}
                                         />
-                                        <p className="text-2xl font-semibold mx-2">wikumanager</p>
+                                        <p className="text-2xl font-semibold mx-2">wikuadmin</p>
                                     </div>
                                     <nav className="mt-5 px-2 space-y-1">
                                         {navigation.map((item) => (
@@ -159,17 +157,13 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
                                     <div className="flex-shrink-0 group block">
                                         <div className="flex items-center">
                                             <div>
-                                                {session?.user?.image ? (
-
-                                                    <Image
-                                                        className="inline-block h-10 w-10 rounded-full"
-                                                        src={session.user?.image || ""}
-                                                        alt=""
-                                                        width={40}
-                                                        height={40}
-                                                    />) : (
-                                                    <UserCircleIcon className="inline-block h-10 w-10 rounded-full" />)}
-
+                                                <Image
+                                                    className="inline-block  w-10 rounded-full h-10"
+                                                    src={session?.user?.image || ""}
+                                                    alt="user profile picture"
+                                                    width={40}
+                                                    height={40}
+                                                />
                                             </div>
                                             <div className="ml-3">
                                                 <p className="text-base font-medium text-gray-700 group-hover:text-gray-900">{session?.user?.name}</p>
@@ -197,7 +191,7 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
                                     width={32}
                                     height={32}
                                 />
-                                <p className="text-2xl font-semibold mx-2">wikumanager</p>
+                                <p className="text-2xl font-semibold mx-2">wikuadmin</p>
                             </div>
                             <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
                                 {navigation.map((item) => (
@@ -233,7 +227,7 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
                                         {session?.user?.image ? (
 
                                             <Image
-                                                className="inline-block h-10 w-10 rounded-full"
+                                                className="inline-block h-auto w-10 rounded-full"
                                                 src={session.user?.image || ""}
                                                 alt=""
                                                 width={40}
@@ -285,4 +279,4 @@ const ManagerLayout: React.FC<IManagerLayoutProps> = ({ children }) => {
     )
 }
 
-export default ManagerLayout
+export default AdminLayout
