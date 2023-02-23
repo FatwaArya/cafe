@@ -1,6 +1,17 @@
 import { z } from "zod";
 import { adminProcedure, createTRPCRouter } from "../trpc";
-import { ROLE } from "@prisma/client";
+import { s3Client } from "./../../s3";
+import {
+  CopyObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
+import { v4 as uuidv4 } from "uuid";
+import probe from "probe-image-size";
+import type { Readable } from "stream";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { TRPCError } from "@trpc/server";
 
 export const adminRouter = createTRPCRouter({
   getUsers: adminProcedure.query(async ({ ctx }) => {
@@ -95,5 +106,95 @@ export const adminRouter = createTRPCRouter({
           email,
         },
       });
+    }),
+  createMenu: adminProcedure
+    .input(
+      z.object({
+        files: z
+          .array(
+            z.object({
+              key: z.string().min(1),
+              ext: z.string().min(1),
+            })
+          )
+          .max(4),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const files = input.files;
+      for (const upload of files) {
+        const uuid = uuidv4();
+        const menuName = uuid + "." + upload.ext;
+
+        const url = await s3Client.send(
+          new CopyObjectCommand({
+            Bucket: "wiku-menu-item",
+            CopySource: "wiku-menu-item/" + upload.key,
+            Key: menuName,
+            ACL: "public-read",
+          })
+        );
+
+        await s3Client.send(
+          new DeleteObjectCommand({
+            Bucket: "wiku-menu-item",
+            Key: upload.key,
+          })
+        );
+
+        const object = await s3Client.send(
+          new GetObjectCommand({
+            Bucket: "wiku-menu-item",
+            Key: menuName,
+          })
+        );
+
+        const fileType = await probe(object.Body as Readable);
+
+        if (
+          !object.ContentLength ||
+          !fileType ||
+          upload.ext !== fileType.type
+        ) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid file uploaded.",
+          });
+        }
+        //todo
+        await ctx.prisma.menu.create({
+          data: {
+            name: "padank",
+            price: "0",
+            desc: "",
+            image:
+              "https://wiku-menu-item.sgp1.digitaloceanspaces.com/" + menuName,
+          },
+        });
+      }
+    }),
+  createPresignedUrl: adminProcedure
+    .input(z.object({ count: z.number().gte(1).lte(4) }))
+    .query(async ({ input }) => {
+      const urls = [];
+
+      for (let i = 0; i < input.count; i++) {
+        const key = uuidv4();
+
+        const url = await getSignedUrl(
+          s3Client,
+          new PutObjectCommand({
+            Bucket: "wiku-menu-item",
+            Key: key,
+          })
+        );
+
+        urls.push({
+          url,
+          key,
+        });
+      }
+
+      return urls;
     }),
 });

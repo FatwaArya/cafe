@@ -156,13 +156,14 @@ const CashierLayout: React.FC<ICashierLayoutProps> = ({ children }) => {
                                     <div className="flex-shrink-0 group block">
                                         <div className="flex items-center">
                                             <div>
-                                                <Image
-                                                    className="inline-block h-10 w-10 rounded-full"
-                                                    src={session?.user?.image || ""}
-                                                    alt=""
-                                                    width={40}
-                                                    height={40}
-                                                />
+                                                {session?.user?.image &&
+                                                    <Image
+                                                        className="inline-block h-10 w-10 rounded-full"
+                                                        src={session?.user?.image || ""}
+                                                        alt=""
+                                                        width={40}
+                                                        height={40}
+                                                    />}
                                             </div>
                                             <div className="ml-3">
                                                 <p className="text-base font-medium text-gray-700 group-hover:text-gray-900">{session?.user?.name}</p>
@@ -223,13 +224,14 @@ const CashierLayout: React.FC<ICashierLayoutProps> = ({ children }) => {
                             <div className="flex-shrink-0 w-full group block">
                                 <div className="flex items-center">
                                     <div>
-                                        <Image
-                                            className="inline-block h-10 w-10 rounded-full"
-                                            src={session?.user?.image || ""}
-                                            alt=""
-                                            width={40}
-                                            height={40}
-                                        />
+                                        {session?.user?.image &&
+                                            <Image
+                                                className="inline-block h-10 w-10 rounded-full"
+                                                src={session?.user?.image || ""}
+                                                alt=""
+                                                width={40}
+                                                height={40}
+                                            />}
                                     </div>
                                     <div className="ml-3">
                                         <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{session?.user?.name}</p>

@@ -24,6 +24,8 @@ export const serverSchema = z.object({
   AUTH0_CLIENT_ID: z.string(),
   AUTH0_CLIENT_SECRET: z.string(),
   AUTH0_ISSUER: z.string(),
+  SPACES_KEY: z.string(),
+  SPACES_SECRET: z.string(),
 });
 
 /**
@@ -41,6 +43,8 @@ export const serverEnv = {
   AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
   AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
   AUTH0_ISSUER: process.env.AUTH0_ISSUER,
+  SPACES_KEY: process.env.SPACES_KEY,
+  SPACES_SECRET: process.env.SPACES_SECRET,
 };
 
 /**

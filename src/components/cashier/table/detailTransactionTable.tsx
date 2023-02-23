@@ -49,10 +49,7 @@ const DetailTransactionTable = ({ id }: { id: string }) => {
 
                                 <div className="bg-gray-50 rounded-lg py-6 px-4 sm:px-6 sm:flex sm:items-center sm:justify-between sm:space-x-6 lg:space-x-8">
                                     <dl className="divide-y divide-gray-200 space-y-6 text-sm text-gray-600 flex-auto sm:divide-y-0 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-x-6 lg:w-1/2 lg:flex-none lg:gap-x-8">
-                                        <div className="flex justify-between pt-6 font-medium text-gray-900 sm:block sm:pt-0">
-                                            <dt>Customer Name</dt>
-                                            <dd className="sm:mt-1">{orders?.transaction?.[0]?.customerName}</dd>
-                                        </div>
+
                                         <div className="flex justify-between sm:block">
                                             <dt className="font-medium text-gray-900">Date placed</dt>
                                             <dd className="sm:mt-1">

@@ -99,7 +99,7 @@ model Menu {
     price       String
     type        MENU_TYPE     @default(FOOD)
     desc        String?
-    image       String?
+    image       String
     Transaction Transaction[]
 }
 

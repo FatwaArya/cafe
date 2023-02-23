@@ -6,10 +6,20 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "../trpc";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { s3Client } from "../../s3";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+
+// const url = await getSignedUrl(
+//   s3Client,
+//   new GetObjectCommand({
+//     Bucket: "wiku-menu-item",
+//     Key: menuName,
+//   })
+// );
 
 export const cashierRouter = createTRPCRouter({
   getsMenu: cashierProcedure.query(async ({ ctx }) => {
-    //get all products
     const products = await ctx.prisma.menu.findMany();
     return products;
   }),
@@ -103,6 +113,8 @@ export const cashierRouter = createTRPCRouter({
         data: {
           transactionNumber,
           total,
+          //increment date by 1 days
+          // createdAt: new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000),
         },
       });
 
@@ -116,6 +128,9 @@ export const cashierRouter = createTRPCRouter({
               userId: ctx.session.user.id,
               quantity: item.quantity,
               transactionDetailId: id,
+              // createdAt: new Date(
+              //   new Date().getTime() + 1 * 24 * 60 * 60 * 1000
+              // ),
             },
           }),
 
