@@ -3,16 +3,79 @@ import { GetServerSidePropsContext, type NextPage } from "next";
 import { signIn } from "next-auth/react";
 
 import Head from "next/head";
-import { useState } from "react";
+import { Fragment, useEffect, useState } from 'react'
+import { Transition } from '@headlessui/react'
 import { FcGoogle } from 'react-icons/fc';
 import { getServerAuthSession } from "../server/auth";
 import Image from "next/image";
+import { XMarkIcon } from '@heroicons/react/20/solid'
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import { useRouter } from "next/router";
+
+
 
 const Home: NextPage = () => {
   const [email, setEmail] = useState("")
+  const [show, setShow] = useState(false)
+  const router = useRouter()
+
+  //show notification access denied
+  useEffect(() => {
+    if (router.query.error === "AccessDenied") {
+      setShow(true)
+    }
+  }, [router.query.error])
+
+
 
   return (
     <>
+
+      <div
+        aria-live="assertive"
+        className="fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start"
+      >
+        <div className="w-full flex flex-col items-center space-y-4 sm:items-end">
+          {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
+          <Transition
+            show={show}
+            as={Fragment}
+            enter="transform ease-out duration-300 transition"
+            enterFrom="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+            enterTo="translate-y-0 opacity-100 sm:translate-x-0"
+            leave="transition ease-in duration-100"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+              <div className="p-4">
+                <div className="flex items-start">
+                  <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <ExclamationTriangleIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+                  </div>
+                  <div className="ml-3 w-0 flex-1 pt-0.5">
+                    <p className="text-sm font-medium text-gray-900">Access Denied</p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Please contact your supervisor to get access.
+                    </p>
+                  </div>
+                  <div className="ml-4 flex-shrink-0 flex">
+                    <button
+                      className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      onClick={() => {
+                        setShow(false)
+                      }}
+                    >
+                      <span className="sr-only">Close</span>
+                      <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </div>
       <Head>
         <title>Sign in</title>
 
@@ -53,6 +116,7 @@ const Home: NextPage = () => {
                         }
 
                       }
+                      placeholder="in progress"
                       required
                       className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />

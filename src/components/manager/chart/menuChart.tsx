@@ -50,8 +50,8 @@ export default function MenuChart() {
     useEffect(() => {
         //make reducer to filter the data if id is the same then merge the data
         const merged = stats?.reduce((acc: any, curr: any) => {
-            const x = acc.find((item: any) => item.menuId === curr.menuId);
-            if (!x) {
+            const found = acc.find((item: any) => item.menuId === curr.menuId);
+            if (!found) {
                 return acc.concat([curr]);
             } else {
                 return acc.map((item: any) => (item.menuId === curr.menuId ? { ...item, _sum: { quantity: item._sum.quantity + curr._sum.quantity } } : item));
@@ -66,8 +66,8 @@ export default function MenuChart() {
                 const date = stat.createdAt
                 return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
             }).reduce((acc: any, curr: any) => {
-                const x = acc.find((item: any) => item.menuId === curr.menuId);
-                if (!x) {
+                const found = acc.find((item: any) => item.menuId === curr.menuId);
+                if (!found) {
                     return acc.concat([curr]);
                 } else {
                     return acc.map((item: any) => (item.menuId === curr.menuId ? { ...item, _sum: { quantity: item._sum.quantity + curr._sum.quantity } } : item));
