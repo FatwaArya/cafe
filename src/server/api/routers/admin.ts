@@ -110,6 +110,10 @@ export const adminRouter = createTRPCRouter({
   createMenu: adminProcedure
     .input(
       z.object({
+        name: z.string().min(1),
+        menuPrice: z.string().min(1),
+        menuDescription: z.string().min(1),
+        menuType: z.enum(["FOOD", "BEVERAGE"]),
         files: z
           .array(
             z.object({
@@ -121,6 +125,7 @@ export const adminRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const { menuPrice, name, menuDescription, menuType } = input;
       const files = input.files;
       for (const upload of files) {
         const uuid = uuidv4();
@@ -149,24 +154,25 @@ export const adminRouter = createTRPCRouter({
           })
         );
 
-        const fileType = await probe(object.Body as Readable);
+        // const fileType = await probe(object.Body as Readable);
 
-        if (
-          !object.ContentLength ||
-          !fileType ||
-          upload.ext !== fileType.type
-        ) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Invalid file uploaded.",
-          });
-        }
+        // if (
+        //   !object.ContentLength ||
+        //   !fileType ||
+        //   upload.ext !== fileType.type
+        // ) {
+        //   throw new TRPCError({
+        //     code: "BAD_REQUEST",
+        //     message: "Invalid file uploaded.",
+        //   });
+        // }
         //todo
         await ctx.prisma.menu.create({
           data: {
-            name: "padank",
-            price: "0",
-            desc: "",
+            name: name,
+            price: menuPrice,
+            desc: menuDescription,
+            type: menuType,
             image:
               "https://wiku-menu-item.sgp1.digitaloceanspaces.com/" + menuName,
           },

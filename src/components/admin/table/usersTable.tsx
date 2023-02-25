@@ -29,6 +29,7 @@ const roleOpts = [
     { role: Role.MANAGER },
     { role: Role.ADMIN },
 ]
+
 export default function UsersTable() {
     const { data: users, status } = api.admin.getUsers.useQuery()
     const [searchField, setSearchField] = useState("")
