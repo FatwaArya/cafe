@@ -1,6 +1,7 @@
 # Wikusama Cafe Cashier System
 
 This is a school project for building a cashier system for Wikusama Cafe using Next.js, trpc, TypeScript, Tailwind, Prisma, and PlanetScaleDB. The system will have three types of users: cashiers, managers, and admins. 
+(contact me if you to try. Devastated#0339)
 
 ## Functionality
 
