@@ -7,16 +7,20 @@ import { GetServerSidePropsContext } from "next";
 import UsersTable from "../../components/admin/table/usersTable";
 import WhitelistTable from "../../components/admin/table/whitelistTable";
 import Head from "next/head";
+import TablesTable from "../../components/admin/table/tablesTable";
 const Admin: WikuPage = () => {
     return (
         <>
             <Head>
                 <title>Admin | Overview</title>
             </Head>
-            <div className="px-4 sm:px-6 lg:px-8">
-                <UsersTable />
+            <UsersTable />
+            <div className="md:grid md:grid-cols-2 md:gap-4">
                 <WhitelistTable />
+                <TablesTable />
             </div>
+
+
         </>
     )
 }

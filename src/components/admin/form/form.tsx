@@ -141,8 +141,7 @@ export default function MenuForm() {
             <form className="space-y-8 divide-y divide-gray-200" onSubmit={handleSubmit}>
                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
 
-
-                    <div className="pt-8 space-y-6 sm:pt-10 sm:space-y-5">
+                    <div className="pt-4 space-y-6 sm:pt-10 sm:space-y-5">
                         <div>
                             <h3 className="text-lg leading-6 font-medium text-gray-900">Menu Information</h3>
                             <p className="mt-1 max-w-2xl text-sm text-gray-500">

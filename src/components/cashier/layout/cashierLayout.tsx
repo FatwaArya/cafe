@@ -14,12 +14,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Fragment, useEffect, useState } from 'react'
 import { Loader } from '../../auth/AuthGuard'
+import { classNames } from '../../../utils/classNames'
 
 
 
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(' ')
-}
 
 interface ICashierLayoutProps {
     children: React.ReactNode

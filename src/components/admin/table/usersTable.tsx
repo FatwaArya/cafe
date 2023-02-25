@@ -5,10 +5,8 @@ import { Dialog, Listbox, Transition } from '@headlessui/react'
 import { ROLE } from "@prisma/client"
 import { Loader } from "../../auth/AuthGuard"
 import WhitelistTable from "./whitelistTable"
+import { classNames } from "../../../utils/classNames"
 
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(' ')
-}
 
 
 export const Role: {
@@ -65,6 +63,7 @@ export default function UsersTable() {
         {
             onSuccess: () => {
                 utils.admin.getUsers.invalidate()
+                utils.admin.getUserById.invalidate({ id: userId })
                 setEditUser(false)
             }, onError: () => {
                 setError(true)
@@ -211,9 +210,7 @@ export default function UsersTable() {
                                     </Dialog.Title>
                                     <div className="mt-2">
                                         <label htmlFor="role" className="block text-sm font-medium text-gray-700 text-left ">
-                                            change role for <span className="capitalize">{user?.name?.toLocaleLowerCase()}</span>
-                                            <br />
-                                            from <span className="capitalize">{user?.role.toLocaleLowerCase()} </span> to <span className="capitalize font-bold">{selectedRole?.role.toLocaleLowerCase()} </span>
+                                            change role for <span className="capitalize">{user?.name?.toLocaleLowerCase()}</span> from <span className="capitalize">{user?.role.toLocaleLowerCase()} </span> to <span className="capitalize font-bold">{selectedRole?.role.toLocaleLowerCase()} </span>
                                         </label>
 
                                         <div className=" mt-2 flex-grow">

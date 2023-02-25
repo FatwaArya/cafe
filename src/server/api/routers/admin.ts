@@ -203,4 +203,35 @@ export const adminRouter = createTRPCRouter({
 
       return urls;
     }),
+  getTables: adminProcedure.query(async ({ ctx }) => {
+    const tables = await ctx.prisma.table.findMany();
+    return tables;
+  }),
+  setAllTablesAvailable: adminProcedure.mutation(async ({ ctx }) => {
+    await ctx.prisma.table.updateMany({
+      where: {
+        status: "OCCUPIED",
+      },
+      data: {
+        status: "AVAILABLE",
+      },
+    });
+  }),
+  setTableToAvailable: adminProcedure
+    .input(
+      z.object({
+        tableId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { tableId } = input;
+      await ctx.prisma.table.update({
+        where: {
+          id: tableId,
+        },
+        data: {
+          status: "AVAILABLE",
+        },
+      });
+    }),
 });

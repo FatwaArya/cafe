@@ -14,12 +14,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Fragment, useEffect, useState } from 'react'
 import { Loader } from '../../auth/AuthGuard'
+import { classNames } from '../../../utils/classNames'
 
 
 
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(' ')
-}
 
 interface IAdminLayoutProps {
     children: React.ReactNode
@@ -254,7 +252,7 @@ const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
                         </button>
                     </div>
                     <main className="flex-1">
-                        <div className="py-6">
+                        <div className="">
                             {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                                 <h1 className="text-2xl font-semibold text-gray-900">{}</h1>
                             </div> */}
