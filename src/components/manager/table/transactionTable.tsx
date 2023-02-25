@@ -11,15 +11,14 @@ import { Loader } from '../../auth/AuthGuard'
 export default function AllTransactionTable() {
     const [searchField, setSearchField] = useState('')
     const startDate = useOrderDateStore(state => state.order.date)
-    const newStartDate = new Date(startDate?.toISOString().slice(0, 10) + 'T00:00:00.000Z').toISOString()
-    const { data: transactions, status } = api.manager.getTransaction.useQuery(
-        { date: newStartDate },
-    )
-    const { data: transactionsDate } = api.manager.getTransaction.useQuery({})
+    const allOrders = useOrderDateStore(state => state.allOrders)
+    const { data: transactionsDate } = api.manager.getTransaction.useQuery()
     const setStartDate = useOrderDateStore(state => state.setDate)
-    const setAllOrders = useOrderDateStore(state => state.setAllOrders)
+    const setAllOrdersTrue = useOrderDateStore(state => state.toggleTrue)
+    const setAllOrdersFalse = useOrderDateStore(state => state.toggleFalse)
+    // const newStartDate = startDate ? new Date(startDate.toISOString()).toISOString() : undefined
+    const { data: transactions, status } = api.manager.getTransaction.useQuery()
     const [filteredTransactions, setFilteredTransactions] = useState(transactions)
-    const [allTime, setAllTime] = useState(false)
 
     useEffect(() => {
         const newFilteredTransactions = transactions?.filter((transaction) => {
@@ -29,28 +28,28 @@ export default function AllTransactionTable() {
     }, [searchField, transactions])
 
     useEffect(() => {
-        if (allTime) {
+        if (allOrders) {
             setFilteredTransactions(transactions)
-            setAllOrders()
         } else {
             const newFilteredTransactions = transactions?.filter((transaction) => {
                 const date = transaction.transaction[0]?.createdAt
                 return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
-            }
-            )
+            })
             setFilteredTransactions(newFilteredTransactions)
         }
-    }, [startDate, transactions, allTime])
+    }, [allOrders, transactions, startDate])
+
+    // console.log(allOrders)
+    // console.log(filteredTransactions)
 
 
     const renderDayContents = (day: any, date: any) => {
         const isTransaction = transactionsDate?.some((transaction) => {
             return transaction.transaction[0]?.createdAt?.getDate() === date.getDate() && transaction.transaction[0]?.createdAt?.getMonth() === date.getMonth() && transaction.transaction[0]?.createdAt?.getFullYear() === date.getFullYear()
         })
-
         return (
             <button className='inline-block relative' key={day} onClick={() => {
-                setAllTime(false)
+                setAllOrdersFalse()
             }}>
                 <div className='' >
                     {date.getDate()}
@@ -59,7 +58,6 @@ export default function AllTransactionTable() {
             </button>
         );
     };
-
     if (status === "loading") { return <Loader /> }
 
     return (
@@ -89,7 +87,9 @@ export default function AllTransactionTable() {
                     <div className="mt-3 relative rounded-md shadow-sm">
                         <DatePicker
                             selected={startDate}
-                            onChange={(date) => setStartDate(date as Date)}
+                            onChange={(date) => {
+                                setStartDate(date as Date)
+                            }}
                             startDate={startDate}
                             selectsStart
                             renderDayContents={renderDayContents}
@@ -108,13 +108,13 @@ export default function AllTransactionTable() {
                                     <div className="space-x-2">
                                         <button
                                             onClick={() => {
-                                                setAllTime(!allTime)
+                                                setAllOrdersTrue()
+                                                //set date to undefined
+                                                setStartDate(undefined as any)
                                             }}
-                                            disabled={allTime}
+                                            disabled={allOrders}
                                             type="button"
-                                            //if all time is true then disable the button
-                                            className={`${allTime && 'cursor-not-allowed opacity-50'} inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500`}
-                                        >
+                                            className={`${allOrders && 'cursor-not-allowed opacity-50'} inline-flex p-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-blue-500`}                           >
                                             All Time
                                         </button>
 

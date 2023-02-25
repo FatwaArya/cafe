@@ -6,11 +6,9 @@ import { Fragment, useState } from 'react'
 import { Items, useOrderStore } from '../../../store/orderStore'
 import { api } from '../../../utils/api'
 import { Loader } from '../../auth/AuthGuard'
+import { classNames } from '../../../utils/classNames'
 
 
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(' ')
-}
 
 
 export default function ItemList() {

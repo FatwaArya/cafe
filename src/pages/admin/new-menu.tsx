@@ -1,21 +1,30 @@
 import { signOut } from "next-auth/react";
 import { WikuPage } from "../_app";
-import { ReactElement } from "react";
+import { ReactElement, useRef, useState } from "react";
 import { roleGuard } from "../../utils/roleGuard";
 import AdminLayout from "../../components/admin/layout/adminLayout";
 import { GetServerSidePropsContext } from "next";
-import UsersTable from "../../components/admin/table/usersTable";
-import WhitelistTable from "../../components/admin/table/whitelistTable";
 import Head from "next/head";
+import { api } from "../../utils/api";
+import { PhotoIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import MenuForm from "../../components/admin/form/form";
+
+
+
 const NewMenu: WikuPage = () => {
+
+
+
     return (
         <>
             <Head>
-                <title>Admin | Overview</title>
+                <title>Admin | Add New Products</title>
             </Head>
-            <div className="px-4 sm:px-6 lg:px-8">
-                menu
-            </div>
+
+            <MenuForm />
+
+
         </>
     )
 }

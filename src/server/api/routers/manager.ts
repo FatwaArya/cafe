@@ -3,92 +3,70 @@ import { z } from "zod";
 import { createTRPCRouter, managerProcedure } from "../trpc";
 
 export const managerRouter = createTRPCRouter({
-  getTransaction: managerProcedure
-    .input(
-      z.object({
-        date: z.string().optional(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const { date } = input;
-      const transactions = await ctx.prisma.transactionDetail.findMany({
-        include: {
-          transaction: {
-            select: {
-              id: true,
-              quantity: true,
-              createdAt: true,
-              user: {
-                select: {
-                  name: true,
-                },
+  getTransaction: managerProcedure.query(async ({ ctx, input }) => {
+    const transactions = await ctx.prisma.transactionDetail.findMany({
+      include: {
+        transaction: {
+          select: {
+            id: true,
+            quantity: true,
+            createdAt: true,
+            user: {
+              select: {
+                name: true,
               },
             },
           },
         },
-        where: {
-          transaction: {
-            some: {
-              createdAt: {
-                gte: date ? date?.slice(0, 10) + "T00:00:00.000Z" : undefined,
-                lte: date ? date?.slice(0, 10) + "T23:59:59.999Z" : undefined,
-              },
-            },
-          },
-        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
+    return transactions;
+  }),
 
-      return transactions;
-    }),
-
-  getStatistic: managerProcedure
-    .input(
-      z.object({
-        date: z.string().nullish(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const { date } = input;
-      const popularMenus = await ctx.prisma.transaction.groupBy({
-        by: ["menuId"],
+  getStatistic: managerProcedure.query(async ({ ctx, input }) => {
+    //group transaction to list out the total quantity of each product
+    const transactions = await ctx.prisma.transaction.groupBy({
+      by: ["menuId", "createdAt"],
+      _sum: {
+        quantity: true,
+      },
+      _count: {
+        id: true,
+      },
+      orderBy: {
         _sum: {
-          quantity: true,
+          quantity: "desc",
         },
-        where: {
-          createdAt: {
-            gte: date ? date?.slice(0, 10) + "T00:00:00.000Z" : undefined,
-            lte: date ? date?.slice(0, 10) + "T23:59:59.999Z" : undefined,
-          },
-        },
-      });
+      },
+    });
 
-      const transactionCreatedAt = await ctx.prisma.transaction.findMany({
-        select: {
-          createdAt: true,
-          quantity: true,
+    //get the menu name
+    const menu = await ctx.prisma.menu.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      where: {
+        id: {
+          in: transactions.map((transaction) => transaction.menuId),
         },
-      });
+      },
+    });
 
-      const popularMenuName = await Promise.all(
-        popularMenus.map(async (menu) => {
-          const menuName = await ctx.prisma.menu.findUnique({
-            where: {
-              id: menu.menuId,
-            },
-          });
-          return menuName;
-        })
-      );
-      return popularMenuName.map((menu, index) => {
-        return {
-          name: menu?.name,
-          quantity: popularMenus?.[index]?._sum.quantity,
-          createdAt: transactionCreatedAt?.[index]?.createdAt,
-        };
-      });
-    }),
+    //merge the menu name to the transaction
+    const merged = transactions.map((transaction, index) => {
+      const menuMatch = menu.find((m) => m.id === transaction.menuId);
+      const menuName = menuMatch ? menuMatch.name : "Unknown Menu Item";
+      return {
+        ...transaction,
+        menuName,
+      };
+    });
+
+    return merged;
+  }),
 });

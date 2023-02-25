@@ -1,32 +1,41 @@
 
-import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
-import { useEffect, useState, } from 'react';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-import { useOrderDateStore } from '../../../store/orderDateStore';
 import { api } from '../../../utils/api';
-import { Loader } from '../../auth/AuthGuard';
+import { useEffect, useState, } from 'react';
+import { useOrderDateStore } from '../../../store/orderDateStore';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface IStats {
-    name: string | undefined;
-    quantity: number | null | undefined;
-    createdAt: Date | undefined;
+    name: string
+    quantity: number
+    createdAt: Date
+}
+
+interface IOrderSummary {
+    _sum: {
+        quantity: number;
+    };
+    _count: {
+        id: number;
+    };
+    menuId: string;
+    createdAt: string;
+    menuName: string;
 }
 
 
 export default function MenuChart() {
     const startDate = useOrderDateStore(state => state.order.date)
-    const newStartDate = new Date(startDate?.toISOString().slice(0, 10) + 'T00:00:00.000Z').toISOString()
-    const { data: stats, status } = api.manager.getStatistic.useQuery({ date: newStartDate })
-    const allTime = useOrderDateStore(state => state.order.allOrders)
-    const [filteredStats, setFilteredStats] = useState(stats)
+    const { data: stats } = api.manager.getStatistic.useQuery()
+    const allTime = useOrderDateStore(state => state.allOrders)
     const [chartData, setChartData] = useState({
-        labels: filteredStats?.map((menu) => menu.name),
+        labels: stats?.map((menu) => menu.menuName),
         datasets: [
             {
                 label: 'Number of Orders',
-                data: filteredStats?.map((menu) => menu.quantity),
+                data: stats?.map((menu) => menu._sum.quantity),
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -48,44 +57,25 @@ export default function MenuChart() {
         ]
     })
 
+
+
     useEffect(() => {
-        const newFilteredAllTime = stats?.reduce((acc: IStats[], cur: IStats) => {
-            const index = acc.findIndex((item) => item.name === cur.name)
-            if (index === -1) {
-                acc.push(cur)
+        //make reducer to filter the data if id is the same then merge the data
+        const merged = stats?.reduce((acc: any, curr: any) => {
+            const found = acc.find((item: any) => item.menuId === curr.menuId);
+            if (!found) {
+                return acc.concat([curr]);
             } else {
-                let quantity = acc?.[index]?.quantity as number
-                quantity += cur.quantity as number
+                return acc.map((item: any) => (item.menuId === curr.menuId ? { ...item, _sum: { quantity: item._sum.quantity + curr._sum.quantity } } : item));
             }
-            return acc
-        }, [])
-
-        const sortedByDate = stats?.filter((stat) => {
-            const date = stat.createdAt
-            return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
-        })
-
-        const newFilteredByDate = sortedByDate?.reduce((acc: IStats[], cur: IStats) => {
-            const index = acc.findIndex((item) => item.name === cur.name)
-            if (index === -1) {
-                acc.push(cur)
-            } else {
-                let quantity = acc?.[index]?.quantity as number
-                quantity += cur.quantity as number
-            }
-            return acc
-        }, [])
-
-
-
+        }, []);
         if (allTime) {
-            setFilteredStats(newFilteredAllTime)
             setChartData({
-                labels: newFilteredAllTime?.map((menu) => menu.name),
+                labels: merged?.map((menu: IOrderSummary) => menu.menuName),
                 datasets: [
                     {
                         label: 'Number of Orders',
-                        data: newFilteredAllTime?.map((menu) => menu.quantity),
+                        data: merged?.map((menu: IOrderSummary) => menu._sum.quantity),
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
@@ -106,14 +96,27 @@ export default function MenuChart() {
                     }
                 ]
             })
-        } else {
-            setFilteredStats(newFilteredByDate)
+
+        }
+        else {
+            const filtered = stats?.filter((stat: { createdAt: Date; }) => {
+                const date = stat.createdAt
+                return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
+            }).reduce((acc: any, curr: any) => {
+                const found = acc.find((item: any) => item.menuId === curr.menuId);
+                if (!found) {
+                    return acc.concat([curr]);
+                } else {
+                    return acc.map((item: any) => (item.menuId === curr.menuId ? { ...item, _sum: { quantity: item._sum.quantity + curr._sum.quantity } } : item));
+                }
+            }, []);
+
             setChartData({
-                labels: newFilteredByDate?.map((menu) => menu.name),
+                labels: filtered?.map((menu: IOrderSummary) => menu.menuName),
                 datasets: [
                     {
                         label: 'Number of Orders',
-                        data: newFilteredByDate?.map((menu) => menu.quantity),
+                        data: filtered?.map((menu: IOrderSummary) => menu._sum.quantity),
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
@@ -131,17 +134,15 @@ export default function MenuChart() {
                             'rgba(255, 159, 64, 1)',
                         ],
                         borderWidth: 2,
-                    }
-                ]
+
+                    }]
             })
         }
-    }, [startDate, stats, allTime])
-    console.log(newStartDate)
 
-    if (status === "loading") { return <Loader /> }
+    }, [startDate, allTime, stats])
 
     return (<>
-        {filteredStats && <>
+        {chartData && <>
             <div className="px-4 sm:px-6 lg:px-8 mt-4 min-h-screen">
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">

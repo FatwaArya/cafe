@@ -14,12 +14,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Fragment, useEffect, useState } from 'react'
 import { Loader } from '../../auth/AuthGuard'
+import { classNames } from '../../../utils/classNames'
 
 
 
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(' ')
-}
 
 interface IAdminLayoutProps {
     children: React.ReactNode
@@ -158,11 +156,11 @@ const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
                                         <div className="flex items-center">
                                             <div>
                                                 <Image
-                                                    className="inline-block  w-10 rounded-full h-10"
-                                                    src={session?.user?.image || ""}
+                                                    className="inline-block w-10 rounded-full h-10"
+                                                    src={session?.user?.image as string}
                                                     alt="user profile picture"
-                                                    width={40}
-                                                    height={40}
+                                                    width={32}
+                                                    height={32}
                                                 />
                                             </div>
                                             <div className="ml-3">
@@ -224,13 +222,14 @@ const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
                             <div className="flex-shrink-0 w-full group block">
                                 <div className="flex items-center">
                                     <div>
-                                        <Image
-                                            className="inline-block h-10 w-10 rounded-full"
-                                            src={session?.user?.image || ""}
-                                            alt=""
-                                            width={40}
-                                            height={40}
-                                        />
+                                        {session?.user?.image &&
+                                            <Image
+                                                className="inline-block h-10 w-10 rounded-full"
+                                                src={session?.user?.image}
+                                                alt=""
+                                                width={40}
+                                                height={40}
+                                            />}
                                     </div>
                                     <div className="ml-3">
                                         <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{session?.user?.name}</p>
@@ -253,7 +252,7 @@ const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
                         </button>
                     </div>
                     <main className="flex-1">
-                        <div className="py-6">
+                        <div className="">
                             {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                                 <h1 className="text-2xl font-semibold text-gray-900">{}</h1>
                             </div> */}
