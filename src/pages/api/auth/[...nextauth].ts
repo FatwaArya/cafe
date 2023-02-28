@@ -51,6 +51,7 @@ export const authOptions: NextAuthOptions = {
         const result = await transport.sendMail({
           to: identifier,
           from: provider.from,
+          sender: `<fatwa@${host}>`,
           subject: `Sign in to ${host}`,
           text: text({ url, host }),
           html: html({ url, host, theme }),
