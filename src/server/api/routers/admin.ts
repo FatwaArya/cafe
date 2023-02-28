@@ -12,6 +12,8 @@ import probe from "probe-image-size";
 import type { Readable } from "stream";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { TRPCError } from "@trpc/server";
+import { createTransport } from "nodemailer";
+import { env } from "../../../env/server.mjs";
 
 export const adminRouter = createTRPCRouter({
   getUsers: adminProcedure.query(async ({ ctx }) => {
