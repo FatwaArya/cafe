@@ -15,6 +15,15 @@ import { TRPCError } from "@trpc/server";
 import { createTransport } from "nodemailer";
 import { env } from "../../../env/server.mjs";
 
+const transporter = createTransport({
+  host: env.EMAIL_SERVER_HOST,
+  port: parseInt(env.EMAIL_SERVER_PORT),
+  auth: {
+    user: env.EMAIL_SERVER_USER,
+    pass: env.EMAIL_SERVER_PASSWORD,
+  },
+});
+
 export const adminRouter = createTRPCRouter({
   getUsers: adminProcedure.query(async ({ ctx }) => {
     const users = await ctx.prisma.user.findMany({
@@ -39,6 +48,14 @@ export const adminRouter = createTRPCRouter({
           email,
         },
       });
+      transporter.sendMail({
+        from: env.EMAIL_FROM,
+        to: email,
+        sender: env.EMAIL_SERVER_USER,
+        subject: "Welcome to Wiku Cafe",
+        text: `Welcome to Wiku Cafe, your email has been whitelisted. You can now sign in to the app with your email.`,
+      });
+
       return user;
     }),
   getWhitelist: adminProcedure.query(async ({ ctx }) => {
