@@ -25,6 +25,9 @@ const transporter = createTransport({
 });
 
 export const adminRouter = createTRPCRouter({
+  getMenus: adminProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.menu.findMany();
+  }),
   getUsers: adminProcedure.query(async ({ ctx }) => {
     const users = await ctx.prisma.user.findMany({
       where: {
@@ -197,6 +200,96 @@ export const adminRouter = createTRPCRouter({
           },
         });
       }
+    }),
+  updateMenu: adminProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string().min(1),
+        menuPrice: z.string().min(1),
+        menuDescription: z.string().min(1),
+        menuType: z.enum(["FOOD", "BEVERAGE"]),
+        files: z
+          .array(
+            z.object({
+              key: z.string().min(1),
+              ext: z.string().min(1),
+            })
+          )
+          .max(4),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { menuPrice, name, menuDescription, menuType, id } = input;
+      const files = input.files;
+      for (const upload of files) {
+        const uuid = uuidv4();
+        const menuName = uuid + "." + upload.ext;
+
+        const url = await s3Client.send(
+          new CopyObjectCommand({
+            Bucket: "wiku-menu-item",
+            CopySource: "wiku-menu-item/" + upload.key,
+            Key: menuName,
+            ACL: "public-read",
+          })
+        );
+
+        await s3Client.send(
+          new DeleteObjectCommand({
+            Bucket: "wiku-menu-item",
+            Key: upload.key,
+          })
+        );
+
+        const object = await s3Client.send(
+          new GetObjectCommand({
+            Bucket: "wiku-menu-item",
+            Key: menuName,
+          })
+        );
+
+        // const fileType = await probe(object.Body as Readable);
+
+        // if (
+        //   !object.ContentLength ||
+        //   !fileType ||
+        //   upload.ext !== fileType.type
+        // ) {
+        //   throw new TRPCError({
+        //     code: "BAD_REQUEST",
+        //     message: "Invalid file uploaded.",
+        //   });
+        // }
+        await ctx.prisma.menu.update({
+          where: {
+            id,
+          },
+          data: {
+            name: name,
+            price: menuPrice,
+            desc: menuDescription,
+            type: menuType,
+            image:
+              "https://wiku-menu-item.sgp1.digitaloceanspaces.com/" + menuName,
+          },
+        });
+      }
+    }),
+  getMenuById: adminProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { id } = input;
+      const menu = await ctx.prisma.menu.findUnique({
+        where: {
+          id,
+        },
+      });
+      return menu;
     }),
   createPresignedUrl: adminProcedure
     .input(z.object({ count: z.number().gte(1).lte(4) }))

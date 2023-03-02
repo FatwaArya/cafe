@@ -37,8 +37,8 @@ const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
             current: false,
         },
         {
-            name: "New menu",
-            href: "/admin/new-menu",
+            name: "Menu",
+            href: "/admin/menu",
             icon: CakeIcon,
             current: false,
         },
@@ -51,10 +51,13 @@ const AdminLayout: React.FC<IAdminLayoutProps> = ({ children }) => {
     ]);
 
     const { asPath } = useRouter();
+
     useEffect(() => {
         if (asPath) {
+
             const newNavigation = navigation.map((nav) => ({
                 ...nav,
+                //evaluates to true if the current path has the same beginning as the href
                 current: nav.href === asPath,
             }));
             setNavigation(newNavigation);

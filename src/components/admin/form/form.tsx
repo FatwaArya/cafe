@@ -1,21 +1,33 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { CheckCircleIcon } from '@heroicons/react/24/outline'
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import { api } from "../../../utils/api";
 import { MENU_TYPE } from "@prisma/client";
+import { useRouter } from 'next/router';
 
 type FileType = { file: File; };
 
 
 export default function MenuForm() {
     const [previewAttachments, setPreviewAttachments] = useState<FileType[]>([])
+    const router = useRouter();
+    const { id } = router.query;
+    const { data: menu } = api.admin.getMenuById.useQuery({ id: id as string, })
     const [menuName, setMenuName] = useState<string>("");
     const [menuPrice, setMenuPrice] = useState<string>("");
     const [menuDescription, setMenuDescription] = useState<string>("");
     const [menuType, setMenuType] = useState<MENU_TYPE>(MENU_TYPE.FOOD);
     const [show, setShow] = useState(false)
-
+    //router query
+    useEffect(() => {
+        if (menu) {
+            setMenuName(menu.name);
+            setMenuPrice(menu.price);
+            setMenuDescription(menu.desc as string);
+            setMenuType(menu.type);
+        }
+    }, [menu])
 
     const createMenu = api.admin.createMenu.useMutation(
         {
@@ -23,16 +35,23 @@ export default function MenuForm() {
                 console.log(error);
             },
             onSuccess: () => {
-                setPreviewAttachments([]);
-                setMenuName("");
-                setMenuPrice("");
-                setMenuDescription("");
-                setMenuType(MENU_TYPE.FOOD);
-                setShow(true);
+                router.push("/admin/menu");
 
             }
         }
     )
+    const updateMenu = api.admin.updateMenu.useMutation(
+        {
+            onError: (error) => {
+                console.log(error);
+            },
+            onSuccess: () => {
+                //redirect to menu page
+                router.push("/admin/menu");
+            }
+        }
+    )
+
     const presignedUrls = api.admin.createPresignedUrl.useQuery(
         {
             count: previewAttachments.length,
@@ -79,14 +98,28 @@ export default function MenuForm() {
 
             }
         }
-        createMenu.mutate({
-            name: menuName,
-            menuPrice,
-            menuDescription,
-            menuType,
-            files: uploads,
-        })
+        if (menu) {
+            updateMenu.mutate({
+                id: menu.id,
+                name: menuName,
+                menuPrice,
+                menuDescription,
+                menuType,
+                files: uploads,
+            })
+        }
+        else {
+            createMenu.mutate({
+                name: menuName,
+                menuPrice,
+                menuDescription,
+                menuType,
+                files: uploads,
+            })
+
+        }
     }
+    console.log(menuName)
 
 
 
@@ -143,7 +176,9 @@ export default function MenuForm() {
 
                     <div className="pt-4 space-y-6 sm:pt-10 sm:space-y-5">
                         <div>
-                            <h3 className="text-lg leading-6 font-medium text-gray-900">Menu Information</h3>
+                            <h3 className="text-lg leading-6 font-medium text-gray-900">{
+                                id === "new" ? "Create new menu" : "Edit menu"
+                            }</h3>
                             <p className="mt-1 max-w-2xl text-sm text-gray-500">
                                 Menu information and details.
                             </p>
