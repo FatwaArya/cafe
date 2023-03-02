@@ -14,10 +14,10 @@ export default function MenuForm() {
     const router = useRouter();
     const { id } = router.query;
     const { data: menu } = api.admin.getMenuById.useQuery({ id: id as string, })
-    const [menuName, setMenuName] = useState<string>("");
-    const [menuPrice, setMenuPrice] = useState<string>("");
-    const [menuDescription, setMenuDescription] = useState<string>("");
-    const [menuType, setMenuType] = useState<MENU_TYPE>(MENU_TYPE.FOOD);
+    const [menuName, setMenuName] = useState<string>(menu?.name ? menu.name : "");
+    const [menuPrice, setMenuPrice] = useState<string>(menu?.price ? menu.name : "");
+    const [menuDescription, setMenuDescription] = useState<string>(menu?.desc ? menu.desc : "");
+    const [menuType, setMenuType] = useState<MENU_TYPE>(menu?.type ? menu.type : MENU_TYPE.FOOD);
     const [show, setShow] = useState(false)
     //router query
     useEffect(() => {
@@ -119,7 +119,7 @@ export default function MenuForm() {
 
         }
     }
-    console.log(menuName)
+    console.log(previewAttachments)
 
 
 

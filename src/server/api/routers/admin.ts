@@ -205,10 +205,10 @@ export const adminRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        name: z.string().min(1),
-        menuPrice: z.string().min(1),
-        menuDescription: z.string().min(1),
-        menuType: z.enum(["FOOD", "BEVERAGE"]),
+        name: z.string().min(1).optional(),
+        menuPrice: z.string().min(1).optional(),
+        menuDescription: z.string().min(1).optional(),
+        menuType: z.enum(["FOOD", "BEVERAGE"]).optional(),
         files: z
           .array(
             z.object({
@@ -216,13 +216,27 @@ export const adminRouter = createTRPCRouter({
               ext: z.string().min(1),
             })
           )
-          .max(4),
+          .max(4)
+          .optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { menuPrice, name, menuDescription, menuType, id } = input;
       const files = input.files;
-      for (const upload of files) {
+      if (files?.length === 0) {
+        await ctx.prisma.menu.update({
+          where: {
+            id: id,
+          },
+          data: {
+            name: name,
+            price: menuPrice,
+            desc: menuDescription,
+            type: menuType,
+          },
+        });
+      }
+      for (const upload of files!) {
         const uuid = uuidv4();
         const menuName = uuid + "." + upload.ext;
 
