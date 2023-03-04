@@ -7,21 +7,7 @@ import { useOrderDateStore } from '../../../store/orderDateStore';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface IStats {
-    name: string
-    quantity: number
-    createdAt: Date
-}
 
-type DailyStars = {
-    date: Date,
-    stars: number,
-}
-
-type Series = {
-    label: string,
-    data: DailyStars[]
-}
 
 type Stats = RouterOutputs['manager']['getStatistic'][0]
 
@@ -30,6 +16,9 @@ export default function MenuChart() {
     const startDate = useOrderDateStore(state => state.order.date)
     const { data: stats } = api.manager.getStatistic.useQuery()
     const allTime = useOrderDateStore(state => state.allOrders)
+    const today = new Date()
+    const [sales, setSales] = useState("0")
+
     const [chartData, setChartData] = useState({
         labels: stats?.map((menu) => menu.menuName),
         datasets: [
@@ -69,7 +58,19 @@ export default function MenuChart() {
                 return acc.map((item: any) => (item.menuId === curr.menuId ? { ...item, _sum: { quantity: item._sum.quantity + curr._sum.quantity } } : item));
             }
         }, []);
+        const filtered = stats?.filter((stat: { createdAt: Date; }) => {
+            const date = stat.createdAt
+            return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
+        }).reduce((acc: any, curr: any) => {
+            const found = acc.find((item: any) => item.menuId === curr.menuId);
+            if (!found) {
+                return acc.concat([curr]);
+            } else {
+                return acc.map((item: any) => (item.menuId === curr.menuId ? { ...item, _sum: { quantity: item._sum.quantity + curr._sum.quantity } } : item));
+            }
+        }, []);
         if (allTime) {
+            setSales(merged?.reduce((acc: number, curr: { _sum: { quantity: any; }; menuPrice: number; }) => acc + curr?._sum?.quantity! * curr.menuPrice as any, 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }))
             setChartData({
                 labels: merged?.map((menu: Stats) => menu.menuName),
                 datasets: [
@@ -99,18 +100,7 @@ export default function MenuChart() {
 
         }
         else {
-            const filtered = stats?.filter((stat: { createdAt: Date; }) => {
-                const date = stat.createdAt
-                return date?.getDate() === startDate?.getDate() && date?.getMonth() === startDate?.getMonth() && date?.getFullYear() === startDate?.getFullYear()
-            }).reduce((acc: any, curr: any) => {
-                const found = acc.find((item: any) => item.menuId === curr.menuId);
-                if (!found) {
-                    return acc.concat([curr]);
-                } else {
-                    return acc.map((item: any) => (item.menuId === curr.menuId ? { ...item, _sum: { quantity: item._sum.quantity + curr._sum.quantity } } : item));
-                }
-            }, []);
-
+            setSales(filtered?.reduce((acc: number, curr: { _sum: { quantity: any; }; menuPrice: number; }) => acc + curr?._sum?.quantity! * curr.menuPrice as any, 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }))
             setChartData({
                 labels: filtered?.map((menu: Stats) => menu.menuName),
                 datasets: [
@@ -147,7 +137,13 @@ export default function MenuChart() {
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">
                         <h1 className="text-xl font-semibold text-gray-900">
-                            {allTime ? 'All Time Sale' : 'Today Sales'}
+                            {
+                                allTime
+                                    ? "All time sales" + " - IDR " + sales
+                                    : startDate?.toDateString() === today.toDateString()
+                                        ? "Today sales - IDR " + sales
+                                        : startDate?.toLocaleDateString() + " sales - IDR " + sales
+                            }
                         </h1>
                         <p className="text-sm text-gray-700">
                             A list of all the orders presented in a chart.

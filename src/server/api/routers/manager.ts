@@ -50,6 +50,7 @@ export const managerRouter = createTRPCRouter({
       select: {
         id: true,
         name: true,
+        price: true,
       },
       where: {
         id: {
@@ -62,9 +63,11 @@ export const managerRouter = createTRPCRouter({
     const merged = transactions.map((transaction, index) => {
       const menuMatch = menu.find((m) => m.id === transaction.menuId);
       const menuName = menuMatch ? menuMatch.name : "Unknown Menu Item";
+      const menuPrice = menuMatch ? parseInt(menuMatch.price) : 0;
       return {
         ...transaction,
         menuName,
+        menuPrice,
       };
     });
 
