@@ -6,6 +6,14 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "../trpc";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { s3Client } from "../../s3";
+import {
+  CopyObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
 
 export const cashierRouter = createTRPCRouter({
   getsMenu: cashierProcedure.query(async ({ ctx }) => {
@@ -85,6 +93,7 @@ export const cashierRouter = createTRPCRouter({
     .input(
       z.object({
         customerName: z.string(),
+        customerCash: z.number(),
         tableId: z.string(),
         total: z.number(),
         items: z.array(
@@ -98,12 +107,17 @@ export const cashierRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { customerName, tableId, items, total } = input;
       const transactionNumber = `${"order-" + uuidv4().slice(0, 8)}`;
+      if (input.customerCash < total) {
+        throw new Error("Customer cash is not enough");
+      }
+
+      let userChange = input.customerCash - total;
       const { id } = await ctx.prisma.transactionDetail.create({
         data: {
           transactionNumber,
           total,
-          //increment date by 1 days
-          // createdAt: new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000),
+          userCash: input.customerCash,
+          userChange,
         },
       });
 
@@ -117,9 +131,7 @@ export const cashierRouter = createTRPCRouter({
               userId: ctx.session.user.id,
               quantity: item.quantity,
               transactionDetailId: id,
-              // createdAt: new Date(
-              //   new Date().getTime() + 1 * 24 * 60 * 60 * 1000
-              // ),
+              status: "PAID",
             },
           }),
 
@@ -133,5 +145,85 @@ export const cashierRouter = createTRPCRouter({
           }),
         ]);
       });
+
+      return userChange;
+    }),
+  updateProfile: cashierProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+        files: z
+          .array(
+            z.object({
+              key: z.string().min(1),
+              ext: z.string().min(1),
+            })
+          )
+          .min(1),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { name, files } = input;
+
+      for (const upload of files!) {
+        const uuid = uuidv4();
+        const menuName = uuid + "." + upload.ext;
+        const url = await s3Client.send(
+          new CopyObjectCommand({
+            Bucket: "wiku-menu-item",
+            CopySource: "wiku-menu-item/" + upload.key,
+            Key: menuName,
+            ACL: "public-read",
+          })
+        );
+
+        await s3Client.send(
+          new DeleteObjectCommand({
+            Bucket: "wiku-menu-item",
+            Key: upload.key,
+          })
+        );
+
+        const object = await s3Client.send(
+          new GetObjectCommand({
+            Bucket: "wiku-menu-item",
+            Key: menuName,
+          })
+        );
+
+        await ctx.prisma.user.update({
+          where: {
+            id: ctx.session.user.id,
+          },
+          data: {
+            name,
+            image:
+              "https://wiku-menu-item.sgp1.digitaloceanspaces.com/" + menuName,
+          },
+        });
+      }
+    }),
+  createPresignedUrl: cashierProcedure
+    .input(z.object({ count: z.number().gte(1).lte(4) }))
+    .query(async ({ input }) => {
+      const urls = [];
+
+      for (let i = 0; i < input.count; i++) {
+        const key = uuidv4();
+
+        const url = await getSignedUrl(
+          s3Client,
+          new PutObjectCommand({
+            Bucket: "wiku-menu-item",
+            Key: key,
+          })
+        );
+
+        urls.push({
+          url,
+          key,
+        });
+      }
+      return urls;
     }),
 });

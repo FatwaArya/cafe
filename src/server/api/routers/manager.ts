@@ -11,6 +11,7 @@ export const managerRouter = createTRPCRouter({
             id: true,
             quantity: true,
             createdAt: true,
+            status: true,
             user: {
               select: {
                 name: true,

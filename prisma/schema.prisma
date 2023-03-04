@@ -129,6 +129,8 @@ model TransactionDetail {
     id                String        @id @default(cuid())
     transactionNumber String
     total             Int
+    userCash          Int
+    userChange        Int
     createdAt         DateTime      @default(now())
     updatedAt         DateTime      @updatedAt
     transaction       Transaction[]

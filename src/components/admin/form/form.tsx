@@ -6,7 +6,7 @@ import { api } from "../../../utils/api";
 import { MENU_TYPE } from "@prisma/client";
 import { useRouter } from 'next/router';
 
-type FileType = { file: File; };
+export type FileType = { file: File; };
 
 
 export default function MenuForm() {

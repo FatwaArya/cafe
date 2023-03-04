@@ -79,7 +79,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/",
     error: "/",
-    // newUser: "/auth/new-user", // New users will be directed here on first sign in (leave the property out if not of interest)
+    newUser: "/new-user", // New users will be directed here on first sign in (leave the property out if not of interest)
   },
 };
 
