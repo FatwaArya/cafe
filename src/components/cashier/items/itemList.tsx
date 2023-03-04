@@ -8,7 +8,78 @@ import { api } from '../../../utils/api'
 import { Loader } from '../../auth/AuthGuard'
 import { classNames } from '../../../utils/classNames'
 
+function UserChangeModal({ open, setOpen, change }: { open: boolean, setOpen: (open: boolean) => void, change: number }) {
 
+    return (
+        <Transition.Root show={open} as={Fragment}>
+            <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" onClose={setOpen}>
+                <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                    </Transition.Child>
+
+                    {/* This element is to trick the browser into centering the modal contents. */}
+                    <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+                        &#8203;
+                    </span>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        enterTo="opacity-100 translate-y-0 sm:scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                        leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    >
+                        <div className="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+                            <div>
+                                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                                    <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+                                </div>
+                                <div className="mt-3 text-center sm:mt-5">
+                                    <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
+                                        Order successful
+                                    </Dialog.Title>
+                                    <div className="mt-2">
+                                        <p className="text-sm text-gray-500">
+                                            {/* user change */}
+                                            Customer change is {
+
+                                                new Intl.NumberFormat('id-ID', {
+                                                    style: 'currency',
+                                                    currency: 'IDR',
+                                                    minimumFractionDigits: 0
+                                                }).format(change)
+
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-5 sm:mt-6">
+                                <button
+                                    type="button"
+                                    className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+                                    onClick={() => setOpen(false)}
+                                >
+                                    Go back to dashboard
+                                </button>
+                            </div>
+                        </div>
+                    </Transition.Child>
+                </div>
+            </Dialog>
+        </Transition.Root>
+    )
+}
 
 
 export default function ItemList() {
@@ -16,7 +87,9 @@ export default function ItemList() {
     const { data: tables } = api.cashier.getsTable.useQuery()
     const utils = api.useContext()
     const [open, setOpen] = useState(false)
+    const [openModal, setOpenModal] = useState(false)
     const [customerName, setCustomerName] = useState('')
+    const [customerCash, setCustomerCash] = useState(0)
     const [selected, setSelected] = useState(tables?.[0])
     const orders = useOrderStore((state) => state.items)
     const addOrder = useOrderStore((state) => state.addItems)
@@ -31,11 +104,13 @@ export default function ItemList() {
     const total = calculateTotalPrice()
     //create order mutation
     const createOrder = api.cashier.createOrder.useMutation({
-        onSuccess: () => {
+        onSuccess(data, variables) {
             utils.cashier.getTransaction.invalidate();
             setOpen(false)
             clearOrder()
-        }
+            setOpenModal(true)
+        },
+
     })
     const handleCreateOrder = () => {
         const order = orders.map((item) => ({
@@ -47,14 +122,17 @@ export default function ItemList() {
             items: order,
             customerName: customerName,
             tableId: selected?.id as string,
-            total: total
+            total: total,
+            customerCash
         })
     }
 
     if (status === "loading") { return <Loader /> }
 
+
     return (
         <>
+            <UserChangeModal open={openModal} setOpen={setOpenModal} change={createOrder.data as number} />
             <div className="bg-white flex flex-col">
                 <div className="sm:flex sm:items-center mb-6">
                     <div className="sm:flex-auto">
@@ -78,45 +156,45 @@ export default function ItemList() {
                 <div className="max-w-7xl mx-auto overflow-hidden ">
                     <h2 className="sr-only">Products</h2>
 
-                    <div className="-mx-px border-l border-t border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3 lg:grid-cols-5 ">
+
+                    <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                         {items?.map((product) => (
-                            <div key={product.id} className="group relative p-4 border-r border-b border-gray-200 sm:p-6 ">
-                                <div className="rounded-lg overflow-hidden bg-gray-200 aspect-w-1 aspect-h-1 ">
+                            <div key={product.id} className="group relative">
+                                <div className="min-h-80 aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:aspect-none lg:h-80">
+
                                     <Image
                                         src={product.image || ""}
                                         alt={product.desc || ""}
-                                        className="w-full h-full object-center object-cover"
+                                        className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                                         width={100}
                                         height={100}
                                     />
                                 </div>
-                                <div className="pt-4 pb-4 text-left">
-                                    <h3 className="text-sm font-medium text-gray-900">
-                                        {product.name}
-                                    </h3>
-                                    <div className="flex justify-between">
-                                        <p className="mt-4 text-base font-medium text-gray-900">{
-                                            new Intl.NumberFormat('id-ID', {
-                                                style: 'currency',
-                                                currency: 'IDR',
-                                            }).format(parseInt(product.price))
-                                        }</p>
-                                        <p className="mt-4 text-base  text-gray-900  font-normal ">{product.type}</p>
+                                <div className="mt-4 flex justify-between gap-2">
+                                    <div>
+                                        <h3 className="text-sm text-gray-700">
+                                            {product.name}
+                                        </h3>
+                                        <p className="mt-1 text-sm text-gray-500">{product.type}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-900">{new Intl.NumberFormat('id-ID', {
+                                            style: 'currency',
+                                            currency: 'IDR',
+                                        }).format(parseInt(product.price))}</p>
+                                        <button
+                                            onClick={() => {
+                                                addOrder(product as Items)
+                                            }}
+                                            type="button"
+                                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 float-right "
+                                        >
+                                            Add item
+                                        </button>
                                     </div>
 
-
                                 </div>
-                                <button
-                                    onClick={() => {
-                                        addOrder(product as Items)
-                                    }}
-                                    type="button"
-                                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 float-right "
-                                >
-                                    Add item
-                                </button>
                             </div>
-
                         ))}
                     </div>
                 </div>
@@ -232,6 +310,8 @@ export default function ItemList() {
                                                                 setCustomerName(e.target.value)
                                                             }}
                                                             placeholder='Customer Name'
+                                                            required
+
                                                         />
                                                     </div>
 
@@ -294,6 +374,22 @@ export default function ItemList() {
                                                             </>
                                                         )}
                                                     </Listbox>
+
+                                                    <label htmlFor="Customer Name" className="block text-sm font-medium text-gray-700">
+                                                        Customer Cash
+                                                    </label>
+                                                    <div className="mt-1">
+                                                        <input
+
+                                                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                                            type="text"
+                                                            onChange={(e) => {
+                                                                setCustomerCash(parseInt(e.target.value))
+                                                            }}
+                                                            placeholder='Customer Cash'
+                                                            required
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <div className="flex justify-between text-base font-medium text-gray-900">
 
@@ -310,7 +406,7 @@ export default function ItemList() {
                                                         }
                                                         className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
                                                     >
-                                                        Checkout
+                                                        Order
                                                     </button>
                                                 </div>
 

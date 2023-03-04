@@ -1,8 +1,8 @@
 
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
-import { api } from '../../../utils/api';
-import { useEffect, useState, } from 'react';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, layouts } from 'chart.js';
+import { Bar, Pie } from 'react-chartjs-2';
+import { RouterOutputs, api } from '../../../utils/api';
+import { useEffect, useMemo, useState, } from 'react';
 import { useOrderDateStore } from '../../../store/orderDateStore';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -13,17 +13,17 @@ interface IStats {
     createdAt: Date
 }
 
-interface IOrderSummary {
-    _sum: {
-        quantity: number;
-    };
-    _count: {
-        id: number;
-    };
-    menuId: string;
-    createdAt: string;
-    menuName: string;
+type DailyStars = {
+    date: Date,
+    stars: number,
 }
+
+type Series = {
+    label: string,
+    data: DailyStars[]
+}
+
+type Stats = RouterOutputs['manager']['getStatistic'][0]
 
 
 export default function MenuChart() {
@@ -71,11 +71,11 @@ export default function MenuChart() {
         }, []);
         if (allTime) {
             setChartData({
-                labels: merged?.map((menu: IOrderSummary) => menu.menuName),
+                labels: merged?.map((menu: Stats) => menu.menuName),
                 datasets: [
                     {
                         label: 'Number of Orders',
-                        data: merged?.map((menu: IOrderSummary) => menu._sum.quantity),
+                        data: merged?.map((menu: Stats) => menu._sum.quantity),
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
@@ -112,11 +112,11 @@ export default function MenuChart() {
             }, []);
 
             setChartData({
-                labels: filtered?.map((menu: IOrderSummary) => menu.menuName),
+                labels: filtered?.map((menu: Stats) => menu.menuName),
                 datasets: [
                     {
                         label: 'Number of Orders',
-                        data: filtered?.map((menu: IOrderSummary) => menu._sum.quantity),
+                        data: filtered?.map((menu: Stats) => menu._sum.quantity),
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
@@ -146,30 +146,37 @@ export default function MenuChart() {
             <div className="px-4 sm:px-6 lg:px-8 mt-4 min-h-screen">
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">
-                        <h1 className="text-xl font-semibold text-gray-900">Analytics</h1>
+                        <h1 className="text-xl font-semibold text-gray-900">
+                            {allTime ? 'All Time Sale' : 'Today Sales'}
+                        </h1>
                         <p className="text-sm text-gray-700">
                             A list of all the orders presented in a chart.
                         </p>
                     </div>
                 </div>
 
-                <div className="flex justify-center  w-full mt-4">
-                    <div className="w-96">
-                        <Pie data={chartData} />
 
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 mt-2">
+                    {//if charData is empty then show the message
+                        chartData?.labels?.length === 0 ? <div className="flex justify-center items-center col-span-2">
+                            <p className="text-lg text-gray-700">No data to show</p>
+                        </div> : <div className=" border rounded-md p-3 col-span-2 h-96">
+                            <Pie data={chartData} options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'right',
+                                    },
+                                },
+
+                            }} />
+                        </div>
+                    }
+
+
                 </div>
-
-
-                {chartData.labels?.map((label, index) => {
-                    //sort the data in descending order
-                    const sortedData = chartData?.datasets?.[0]?.data?.sort((a: any, b: any) => b - a) || []
-                    return <div key={index} className="flex justify-between">
-                        <p className="text-sm text-gray-700">{label}</p>
-                        <p className="text-sm text-gray-700">{sortedData[index]}</p>
-                    </div>
-
-                })}
             </div>
 
         </>}

@@ -23,6 +23,7 @@ const roleRedirects: RoleRedirects = {
     MANAGER: "/manager",
     CASHIER: "/cashier",
   },
+
 };
 
 export async function roleGuard(
@@ -43,12 +44,14 @@ export async function roleGuard(
     //@ts-ignore
     const redirectDestination = roleRedirects[role][session.user?.role as string];
     if (redirectDestination) {
+
       return {
         redirect: {
           destination: redirectDestination,
           permanent: false,
         },
       };
+
     }
 
     return cb({ session });
