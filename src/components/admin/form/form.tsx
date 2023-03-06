@@ -5,6 +5,7 @@ import { XMarkIcon } from '@heroicons/react/20/solid'
 import { api } from "../../../utils/api";
 import { MENU_TYPE } from "@prisma/client";
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 export type FileType = { file: File; };
 
@@ -306,12 +307,12 @@ export default function MenuForm() {
 
                 <div className="pt-5">
                     <div className="flex justify-end">
-                        <button
-                            type="button"
+                        <Link
+                            href="/admin/menu"
                             className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                             Cancel
-                        </button>
+                        </Link>
                         <button
                             type="submit"
 

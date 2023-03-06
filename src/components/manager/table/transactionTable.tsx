@@ -91,7 +91,6 @@ export default function AllTransactionTable() {
                                 setStartDate(date as Date)
                             }}
                             startDate={startDate}
-
                             selectsStart
                             renderDayContents={renderDayContents}
                             placeholderText='All Time'
@@ -102,7 +101,7 @@ export default function AllTransactionTable() {
                                 prevMonthButtonDisabled,
                                 nextMonthButtonDisabled,
                             }) => (
-                                <div className="flex items-center justify-between px-2 py-2 ">
+                                <div className="flex items-center justify-between px-2 py-2">
                                     <span className="text-lg text-gray-700 ">
                                         {format(date, 'MM/dd/yyyy')}
                                     </span>
