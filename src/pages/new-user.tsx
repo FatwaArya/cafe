@@ -160,7 +160,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         if (session.user?.name) {
             return {
                 redirect: {
-                    destination: "/cashier",
+                    destination: `/${session.user.role.toLocaleLowerCase()}`,
                     permanent: false,
                 },
             }
