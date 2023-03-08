@@ -360,4 +360,26 @@ export const adminRouter = createTRPCRouter({
         },
       });
     }),
+  addTable: adminProcedure
+    .input(
+      z.object({
+        //max number is 2 digits
+        number: z.string().min(1).max(2),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { number } = input;
+      if (number.length > 2) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid table number",
+        });
+      }
+      await ctx.prisma.table.create({
+        data: {
+          number: number,
+          status: "AVAILABLE",
+        },
+      });
+    }),
 });
