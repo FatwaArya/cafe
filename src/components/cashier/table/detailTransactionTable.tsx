@@ -12,6 +12,8 @@ const DetailTransactionTable = ({ id }: { id: string }) => {
 
     if (status === "loading") { return <Loader /> }
 
+
+
     return (
         <>
 

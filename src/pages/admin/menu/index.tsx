@@ -21,7 +21,7 @@ const Menu: WikuPage = () => {
     return (
         <>
             <Head>
-                <title>Admin | Add New Products</title>
+                <title>Admin | Listed Products</title>
             </Head>
 
             {/* <MenuForm /> */}

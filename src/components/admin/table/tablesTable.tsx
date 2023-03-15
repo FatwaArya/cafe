@@ -3,10 +3,7 @@ import { Loader } from "../../auth/AuthGuard"
 import { Fragment, useRef, useState } from "react"
 import { UserGroupIcon } from "@heroicons/react/24/outline"
 import { Dialog, Transition } from "@headlessui/react"
-
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(' ')
-}
+import { classNames } from "../../../utils/classNames"
 
 export default function TablesTable() {
     const [open, setOpen] = useState(false)

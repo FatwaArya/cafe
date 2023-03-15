@@ -12,6 +12,7 @@ import { api } from '../../../utils/api'
 import { useMemo, useState } from 'react'
 import { Menu } from '@prisma/client'
 import Link from 'next/link'
+import { Loader } from '../../auth/AuthGuard'
 
 
 
@@ -29,7 +30,14 @@ const columns = [
 
     columnHelper.accessor("price", {
         header: "Price",
-        cell: info => info.getValue(),
+        cell: info => {
+            const price = info.getValue()
+            const formatter = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+            })
+            return formatter.format(parseInt(price))
+        },
     }),
     columnHelper.accessor("type", {
         header: "Category",
@@ -42,7 +50,7 @@ const columns = [
 ]
 
 export default function MenuTable() {
-    const { data: Menus } = api.admin.getMenus.useQuery()
+    const { data: Menus, status } = api.admin.getMenus.useQuery()
     const [sorting, setSorting] = useState<SortingState>([])
 
     const table = useReactTable({
@@ -57,6 +65,7 @@ export default function MenuTable() {
 
     })
 
+    if (status === "loading") return <Loader />
 
 
 

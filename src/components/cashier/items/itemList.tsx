@@ -386,9 +386,7 @@ export default function ItemList() {
                                                             onChange={(e) => {
                                                                 setCustomerCash(parseInt(e.target.value))
                                                             }}
-                                                            //rupiah pattern
-                                                            pattern="\d+(\.\d{0,2})?"
-                                                            datatype='currency'
+                                                            pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$"
                                                             placeholder='Customer Cash'
                                                             required
                                                         />

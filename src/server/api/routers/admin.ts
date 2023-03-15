@@ -26,7 +26,7 @@ const transporter = createTransport({
 
 export const adminRouter = createTRPCRouter({
   getMenus: adminProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.menu.findMany();
+    return await ctx.prisma.menu.findMany({});
   }),
   getUsers: adminProcedure.query(async ({ ctx }) => {
     const users = await ctx.prisma.user.findMany({

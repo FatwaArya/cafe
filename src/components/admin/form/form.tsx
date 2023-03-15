@@ -1,25 +1,92 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
-import { CheckCircleIcon } from '@heroicons/react/24/outline'
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import { api } from "../../../utils/api";
 import { MENU_TYPE } from "@prisma/client";
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { Loader } from '../../auth/AuthGuard';
 
 export type FileType = { file: File; };
+function Notification({ show, setShow, isSuccessful, message }: { show: boolean; setShow: (show: boolean) => void; isSuccessful: boolean; message?: string; }) {
 
+    return (
+        <>
+            {/* Global notification live region, render this permanently at the end of the document */}
+            <div
+                aria-live="assertive"
+                className="fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start"
+            >
+                <div className="w-full flex flex-col items-center space-y-4 sm:items-end">
+                    {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
+                    <Transition
+                        show={show}
+                        as={Fragment}
+                        enter="transform ease-out duration-300 transition"
+                        enterFrom="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                        enterTo="translate-y-0 opacity-100 sm:translate-x-0"
+                        leave="transition ease-in duration-100"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+                            <div className="p-4">
+                                <div className="flex items-start">
+                                    <div className="flex-shrink-0">
+                                        {isSuccessful ? (<CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />
+                                        ) : <XCircleIcon className="h-6 w-6 text-red-400" aria-hidden="true" />
+                                        }
+                                    </div>
+                                    <div className="ml-3 w-0 flex-1 pt-0.5">
+                                        {isSuccessful ? (
+                                            <>
+                                                <p className="text-sm font-medium text-gray-900">Successfully saved!</p>
+                                                <p className="mt-1 text-sm text-gray-500">Cashier can now use the menu for transaction.</p>
+                                            </>
+                                        ) : (
+
+                                            <>
+                                                <p className="text-sm font-medium text-gray-900">Error has been occured</p>
+                                                <p className="mt-1 text-sm text-gray-500">{message}</p>
+                                            </>
+                                        )}
+                                    </div>
+                                    <div className="ml-4 flex-shrink-0 flex">
+                                        <button
+                                            className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            onClick={() => {
+                                                setShow(false)
+                                            }}
+                                        >
+                                            <span className="sr-only">Close</span>
+                                            <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Transition>
+                </div>
+            </div>
+        </>
+    )
+}
 
 export default function MenuForm() {
     const [previewAttachments, setPreviewAttachments] = useState<FileType[]>([])
     const router = useRouter();
     const { id } = router.query;
-    const { data: menu } = api.admin.getMenuById.useQuery({ id: id as string, })
+    const utils = api.useContext()
+    const { data: menu, status } = api.admin.getMenuById.useQuery({ id: id as string, })
     const [menuName, setMenuName] = useState<string>(menu?.name ? menu.name : "");
     const [menuPrice, setMenuPrice] = useState<string>(menu?.price ? menu.name : "");
     const [menuDescription, setMenuDescription] = useState<string>(menu?.desc ? menu.desc : "");
     const [menuType, setMenuType] = useState<MENU_TYPE>(menu?.type ? menu.type : MENU_TYPE.FOOD);
     const [show, setShow] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<string>("")
+    const [isSuccessful, setIsSuccessful] = useState(false)
+
     //router query
     useEffect(() => {
         if (menu) {
@@ -33,9 +100,14 @@ export default function MenuForm() {
     const createMenu = api.admin.createMenu.useMutation(
         {
             onError: (error) => {
-                console.log(error);
+                setShow(true);
+                setErrorMessage(error.message)
+                setIsSuccessful(false)
             },
             onSuccess: () => {
+                setShow(true)
+                setIsSuccessful(true)
+                utils.admin.getMenus.invalidate()
                 router.push("/admin/menu");
 
             }
@@ -44,10 +116,16 @@ export default function MenuForm() {
     const updateMenu = api.admin.updateMenu.useMutation(
         {
             onError: (error) => {
-                console.log(error);
+                setShow(true);
+                setErrorMessage(error.message)
+                setIsSuccessful(false)
             },
             onSuccess: () => {
                 //redirect to menu page
+                setShow(true)
+                setIsSuccessful(true)
+                utils.admin.getMenus.invalidate()
+
                 router.push("/admin/menu");
             }
         }
@@ -120,58 +198,14 @@ export default function MenuForm() {
 
         }
     }
-    console.log(previewAttachments)
+    // console.log(previewAttachments)
 
 
 
     return (
         <>
             {/* Global notification live region, render this permanently at the end of the document */}
-            <div
-                aria-live="assertive"
-                className="fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start"
-            >
-                <div className="w-full flex flex-col items-center space-y-4 sm:items-end">
-                    {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
-                    <Transition
-                        show={show}
-                        as={Fragment}
-                        enter="transform ease-out duration-300 transition"
-                        enterFrom="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-                        enterTo="translate-y-0 opacity-100 sm:translate-x-0"
-                        leave="transition ease-in duration-100"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
-                        <div className="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
-                            <div className="p-4">
-                                <div className="flex items-start">
-                                    <div className="flex-shrink-0">
-                                        <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />
-                                    </div>
-                                    <div className="ml-3 w-0 flex-1 pt-0.5">
-                                        <p className="text-sm font-medium text-gray-900">Successfully saved!</p>
-                                        <p className="mt-1 text-sm text-gray-500">
-                                            New menu has been created!
-                                        </p>
-                                    </div>
-                                    <div className="ml-4 flex-shrink-0 flex">
-                                        <button
-                                            className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                            onClick={() => {
-                                                setShow(false)
-                                            }}
-                                        >
-                                            <span className="sr-only">Close</span>
-                                            <XMarkIcon className="h-5 w-5" aria-hidden="true" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </Transition>
-                </div>
-            </div>
+            <Notification show={show} setShow={setShow} isSuccessful={isSuccessful} message={errorMessage} />
             <form className="space-y-8 divide-y divide-gray-200" onSubmit={handleSubmit}>
                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
 
